@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Mental Health Analysis — Kehinde Odewabi</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2128;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --muted: #6e7681;
+    --heading: #e6edf3;
+    --teal: #39d0b8;
+    --teal-dim: #1a3d38;
+    --amber: #f0a04b;
+    --amber-dim: #3d2a0f;
+    --red: #f47067;
+    --red-dim: #3d1010;
+    --blue: #6cb6ff;
+    --blue-dim: #0d2a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.85;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    padding: 16px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(13,17,23,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem; color: var(--teal); text-decoration: none;
+  }
+  .nav-back {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem; color: var(--muted); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--teal); }
+
+  /* HERO */
+  .hero {
+    padding: 120px 48px 64px;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hero-grid {
+    max-width: 1080px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 320px; gap: 64px; align-items: start;
+  }
+  .hero-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; color: var(--teal);
+    letter-spacing: 0.15em; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-tag::before { content: '//'; color: var(--muted); }
+  .hero h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: clamp(2rem, 4.5vw, 3.8rem);
+    font-weight: 600; line-height: 1.1;
+    color: var(--heading); margin-bottom: 24px;
+  }
+  .hero h1 .highlight { color: var(--teal); }
+  .hero-lead {
+    font-size: 1rem; color: var(--muted);
+    max-width: 540px; line-height: 1.75;
+    font-style: italic;
+  }
+  /* terminal card */
+  .terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .terminal-bar {
+    background: var(--surface2);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f47067; }
+  .dot-y { background: #f0a04b; }
+  .dot-g { background: #39d0b8; }
+  .terminal-title { font-size: 0.68rem; color: var(--muted); margin-left: 8px; }
+  .terminal-body { padding: 20px; font-size: 0.78rem; line-height: 1.8; }
+  .t-comment { color: var(--muted); }
+  .t-key { color: var(--blue); }
+  .t-val { color: var(--amber); }
+  .t-green { color: var(--teal); }
+  .t-line { margin-bottom: 4px; }
+
+  /* KPI ROW */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    max-width: 1080px; margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+  .kpi-cell {
+    padding: 32px 24px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .kpi-cell:last-child { border-right: none; }
+  .kpi-cell::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-cell.teal::before { background: var(--teal); }
+  .kpi-cell.amber::before { background: var(--amber); }
+  .kpi-cell.red::before { background: var(--red); }
+  .kpi-cell.blue::before { background: var(--blue); }
+  .kpi-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 2rem; font-weight: 500;
+    line-height: 1; margin-bottom: 6px;
+    color: var(--heading);
+  }
+  .kpi-num.t { color: var(--teal); }
+  .kpi-num.a { color: var(--amber); }
+  .kpi-num.r { color: var(--red); }
+  .kpi-num.b { color: var(--blue); }
+  .kpi-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+    display: block; margin-bottom: 4px;
+  }
+  .kpi-label { font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; }
+
+  /* BODY LAYOUT */
+  .page-body {
+    max-width: 1080px; margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* SECTIONS */
+  .section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+  .section:last-child { border-bottom: none; }
+
+  .sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem; color: var(--teal);
+    letter-spacing: 0.15em; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sec-tag::before { content: '##'; color: var(--border); }
+
+  h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1.6rem; font-weight: 600;
+    color: var(--heading); line-height: 1.25; margin-bottom: 20px;
+  }
+  h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--heading); margin: 28px 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h3::before { content: '>'; color: var(--teal); font-family: 'IBM Plex Mono', monospace; }
+  p { margin-bottom: 16px; }
+
+  /* PROCESS */
+  .process-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: var(--border); margin: 32px 0;
+  }
+  .proc-card {
+    background: var(--surface);
+    padding: 28px;
+    transition: background 0.2s;
+  }
+  .proc-card:hover { background: var(--surface2); }
+  .proc-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem; color: var(--teal);
+    margin-bottom: 10px;
+  }
+  .proc-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    color: var(--heading); margin-bottom: 8px;
+  }
+  .proc-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.65; margin: 0; }
+
+  /* DIFF TABLE */
+  .diff-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.85rem; }
+  .diff-table th {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 10px 14px; text-align: left;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .diff-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .diff-table tr:hover td { background: var(--surface); }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem; font-weight: 500;
+    padding: 2px 7px; border-radius: 3px;
+    display: inline-block; margin-right: 4px;
+  }
+  .badge-new { background: var(--teal-dim); color: var(--teal); }
+  .badge-removed { background: var(--red-dim); color: var(--red); }
+  .badge-renamed { background: var(--blue-dim); color: var(--blue); }
+  .badge-raw { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+  td code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    background: var(--surface2);
+    padding: 1px 6px;
+    color: var(--amber);
+    border-radius: 3px;
+  }
+
+  /* DAX BLOCKS */
+  .dax-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .dax-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .dax-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; color: var(--muted);
+  }
+  .dax-lang {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem; color: var(--teal);
+    background: var(--teal-dim); padding: 2px 8px; border-radius: 3px;
+  }
+  .dax-body {
+    padding: 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem; line-height: 1.8; color: var(--text);
+  }
+  .dax-comment { color: var(--muted); }
+  .dax-fn { color: var(--blue); }
+  .dax-kw { color: var(--teal); }
+  .dax-str { color: var(--amber); }
+  .dax-var { color: var(--red); }
+
+  /* COHORT TABLE */
+  .cohort-table { width: 100%; border-collapse: collapse; margin: 28px 0; }
+  .cohort-table th {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  .cohort-table td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+  .cohort-table tr:hover td { background: var(--surface); }
+  .yr-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem; color: var(--heading); font-weight: 500;
+  }
+  .pct-bar-wrap { display: flex; align-items: center; gap: 10px; }
+  .pct-bar-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .pct-bar-fill { height: 100%; border-radius: 4px; animation: grow 1.2s ease both; }
+  .pct-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; width: 44px; }
+  .fill-teal { background: var(--teal); }
+  .fill-amber { background: var(--amber); }
+  .fill-red { background: var(--red); }
+  @keyframes grow { from { width: 0; } }
+
+  /* ALERT BOX */
+  .alert {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    background: var(--amber-dim);
+    padding: 20px 24px; margin: 28px 0;
+  }
+  .alert-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem; color: var(--amber);
+    letter-spacing: 0.1em; margin-bottom: 8px;
+  }
+  .alert p { font-size: 0.9rem; color: var(--text); margin: 0; }
+
+  /* INSIGHT STRIP */
+  .insight-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border); margin: 28px 0;
+  }
+  .insight-card {
+    background: var(--surface); padding: 24px;
+    transition: background 0.2s;
+  }
+  .insight-card:hover { background: var(--surface2); }
+  .insight-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.8rem; font-weight: 500; color: var(--teal);
+    line-height: 1; margin-bottom: 6px;
+  }
+  .insight-val.amber { color: var(--amber); }
+  .insight-val.red { color: var(--red); }
+  .insight-label { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+
+  /* REC LIST */
+  .rec-list { list-style: none; margin: 20px 0; }
+  .rec-list li {
+    padding: 16px 0 16px 24px; border-bottom: 1px solid var(--border);
+    position: relative; font-size: 0.93rem;
+  }
+  .rec-list li::before {
+    content: '→'; position: absolute; left: 0;
+    font-family: 'IBM Plex Mono', monospace; color: var(--teal);
+  }
+  .rec-list li strong { color: var(--heading); font-weight: 600; }
+
+  /* DOWNLOAD */
+  .download-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 64px 48px;
+  }
+  .dl-inner { max-width: 1080px; margin: 0 auto; }
+  .dl-inner h2 { color: var(--heading); margin-bottom: 8px; }
+  .dl-inner > p { color: var(--muted); font-size: 0.85rem; margin-bottom: 36px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; }
+  .dl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; }
+  .dl-btn {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 18px 20px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s; cursor: pointer;
+  }
+  .dl-btn:hover { border-color: var(--teal); background: var(--teal-dim); }
+  .dl-icon { font-size: 1.2rem; }
+  .dl-title { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; color: var(--heading); font-weight: 600; }
+  .dl-sub { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg); border-top: 1px solid var(--border);
+    padding: 24px 48px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  footer p { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); }
+  footer a { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--teal); text-decoration: none; }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .fade { animation: fadeUp 0.6s ease both; }
+  .d1 { animation-delay:0.1s; } .d2 { animation-delay:0.2s; } .d3 { animation-delay:0.35s; }
+
+  @media (max-width: 860px) {
+    nav, .hero, .download-section, footer { padding-left: 20px; padding-right: 20px; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .terminal { display: none; }
+    .kpi-row { grid-template-columns: repeat(3, 1fr); }
+    .page-body { padding: 0 20px; }
+    .process-grid { grid-template-columns: 1fr; }
+    .insight-strip { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">kehinde.odewabi</a>
+  <a href="index.html" class="nav-back">← all_projects</a>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag fade">Excel · Power Query · Power BI · DAX</div>
+      <h1 class="fade d1">Student <span class="highlight">Mental Health</span><br>Risk Analysis</h1>
+      <p class="hero-lead fade d2">A cohort-based severity analysis of 101 university students — moving beyond prevalence counting into structured risk segmentation and intervention prioritisation.</p>
+    </div>
+    <div class="terminal fade d3">
+      <div class="terminal-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="terminal-title">dataset_summary.txt</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-comment">// project metadata</span></div>
+        <div class="t-line"><span class="t-key">students</span>: <span class="t-val">101</span></div>
+        <div class="t-line"><span class="t-key">age_range</span>: <span class="t-val">18 – 24</span></div>
+        <div class="t-line"><span class="t-key">years_of_study</span>: <span class="t-val">1 – 4</span></div>
+        <div class="t-line"><span class="t-key">conditions</span>: <span class="t-val">3</span></div>
+        <div class="t-line">&nbsp;</div>
+        <div class="t-line"><span class="t-comment">// tools</span></div>
+        <div class="t-line"><span class="t-key">cleaning</span>: <span class="t-green">Excel + Power Query</span></div>
+        <div class="t-line"><span class="t-key">modelling</span>: <span class="t-green">DAX (Power BI)</span></div>
+        <div class="t-line"><span class="t-key">viz</span>: <span class="t-green">Power BI Dashboard</span></div>
+        <div class="t-line">&nbsp;</div>
+        <div class="t-line"><span class="t-comment">// source</span></div>
+        <div class="t-line"><span class="t-key">dataset</span>: <span class="t-val">Kaggle</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- KPI ROW -->
+<div style="border-bottom: 1px solid var(--border);">
+  <div class="kpi-row">
+    <div class="kpi-cell teal">
+      <span class="kpi-num t">101</span>
+      <span class="kpi-label">Total Students</span>
+    </div>
+    <div class="kpi-cell amber">
+      <span class="kpi-num a">64</span>
+      <span class="kpi-pct">63.4% of cohort</span>
+      <span class="kpi-label">Any Condition</span>
+    </div>
+    <div class="kpi-cell amber">
+      <span class="kpi-num a">28</span>
+      <span class="kpi-pct">27.7% of cohort</span>
+      <span class="kpi-label">Multiple Cases</span>
+    </div>
+    <div class="kpi-cell red">
+      <span class="kpi-num r">10</span>
+      <span class="kpi-pct">9.9% of cohort</span>
+      <span class="kpi-label">Complex Cases</span>
+    </div>
+    <div class="kpi-cell blue">
+      <span class="kpi-num b">6</span>
+      <span class="kpi-pct">sought help</span>
+      <span class="kpi-label">Specialist Care</span>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="page-body">
+
+  <!-- OBJECTIVE -->
+  <section class="section">
+    <div class="sec-tag">01 objective</div>
+    <h2>Not "how many?" — but "how severe, and when?"</h2>
+    <p>Most mental health analyses stop at prevalence: counting how many students report a condition. This project was structured around a different question — <strong style="color:var(--heading)">does psychological burden intensify as students advance academically?</strong></p>
+    <p>The analysis was built on three principles: cohort-based comparison using Year of Study as the primary lens, severity stratification separating single from overlapping conditions, and proportional normalisation to prevent enrollment imbalance from distorting results. The goal was risk identification and intervention prioritisation, not descriptive reporting.</p>
+  </section>
+
+  <!-- DATA PROCESS -->
+  <section class="section">
+    <div class="sec-tag">02 data preparation</div>
+    <h2>Cleaning, removing noise, and engineering severity</h2>
+    <p>The raw dataset had 11 columns and 101 rows collected via a survey form. Several structural problems needed resolving before any analysis could begin.</p>
+
+    <div class="process-grid">
+      <div class="proc-card">
+        <div class="proc-num">STEP_01</div>
+        <div class="proc-title">Removed Low-Signal Columns</div>
+        <p class="proc-desc">Dropped <code style="font-size:0.76rem;background:var(--surface2);padding:2px 5px;color:var(--amber)">Timestamp</code> — narrow collection window made it analytically meaningless. Dropped <code style="font-size:0.76rem;background:var(--surface2);padding:2px 5px;color:var(--amber)">Course</code> — excessive categorical fragmentation with low signal value would have added noise, not insight.</p>
+      </div>
+      <div class="proc-card">
+        <div class="proc-num">STEP_02</div>
+        <div class="proc-title">Standardised Categorical Values</div>
+        <p class="proc-desc">Column headers were renamed from verbose survey labels (e.g. "Do you have Anxiety?") to clean field names. CGPA was grouped into standardised ranges: 0–1.99, 2.00–2.49, 2.50–2.99, 3.00–3.49, 3.50–4.00. Year labels normalised to Year 1–4.</p>
+      </div>
+      <div class="proc-card">
+        <div class="proc-num">STEP_03</div>
+        <div class="proc-title">Removed Incomplete Records</div>
+        <p class="proc-desc">Blank and incomplete rows were removed to ensure analytical reliability. The cleaned dataset retained all 101 valid student records across the four year cohorts.</p>
+      </div>
+      <div class="proc-card">
+        <div class="proc-num">STEP_04</div>
+        <div class="proc-title">Severity Engineering — 3 New Columns</div>
+        <p class="proc-desc">Three derived classification columns were created to measure escalation intensity rather than simple presence. This is the core feature engineering step that powers the entire severity analysis.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLUMNS SECTION -->
+  <section class="section">
+    <div class="sec-tag">03 column changes</div>
+    <h2>What was removed, renamed, and built from scratch</h2>
+
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Column</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Timestamp</td>
+          <td><span class="badge badge-removed">REMOVED</span></td>
+          <td>Narrow survey window made time analysis meaningless</td>
+        </tr>
+        <tr>
+          <td>What is your course?</td>
+          <td><span class="badge badge-removed">REMOVED</span></td>
+          <td>Too many fragmented categories, low analytical signal</td>
+        </tr>
+        <tr>
+          <td>Choose your gender → <code>Gender</code></td>
+          <td><span class="badge badge-renamed">RENAMED</span></td>
+          <td>Shortened from verbose survey phrasing</td>
+        </tr>
+        <tr>
+          <td>Your current year of Study → <code>Year Of Study</code></td>
+          <td><span class="badge badge-renamed">RENAMED</span></td>
+          <td>Standardised to clean label</td>
+        </tr>
+        <tr>
+          <td>What is your CGPA? → <code>CGPA range</code></td>
+          <td><span class="badge badge-renamed">RENAMED</span></td>
+          <td>Grouped into 5 standardised ranges for pivot analysis</td>
+        </tr>
+        <tr>
+          <td>Do you have Depression? → <code>Depression?</code></td>
+          <td><span class="badge badge-renamed">RENAMED</span></td>
+          <td>Shortened; same for Anxiety and Panic Attack</td>
+        </tr>
+        <tr>
+          <td><code>S/N</code></td>
+          <td><span class="badge badge-new">NEW</span></td>
+          <td>Serial number column added for row identification</td>
+        </tr>
+        <tr>
+          <td><code>At least 1</code> — Any Condition</td>
+          <td><span class="badge badge-new">NEW</span></td>
+          <td>TRUE if student reports at least one condition. Baseline prevalence flag.</td>
+        </tr>
+        <tr>
+          <td><code>At least 2</code> — Multiple Cases</td>
+          <td><span class="badge badge-new">NEW</span></td>
+          <td>TRUE if two or more conditions present concurrently. Elevated burden flag.</td>
+        </tr>
+        <tr>
+          <td><code>All three</code> — Complex Cases</td>
+          <td><span class="badge badge-new">NEW</span></td>
+          <td>TRUE if all three conditions (Anxiety + Depression + Panic Attack) reported together. Highest severity tier.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FORMULAS & DAX -->
+  <section class="section">
+    <div class="sec-tag">04 formulas &amp; dax logic</div>
+    <h2>The calculations that drive the severity model</h2>
+
+    <h3>Excel — Severity Classification Columns</h3>
+    <p>These three columns were calculated directly in Excel using OR/AND logic on the three condition columns before the data was loaded into Power BI.</p>
+
+    <div class="dax-block">
+      <div class="dax-header">
+        <span class="dax-title">At least 1 — Any Condition</span>
+        <span class="dax-lang">EXCEL</span>
+      </div>
+      <div class="dax-body">
+        <span class="dax-comment">// TRUE if any one condition is reported</span><br>
+        =<span class="dax-fn">OR</span>(<span class="dax-var">G2</span>=<span class="dax-str">"Yes"</span>, <span class="dax-var">H2</span>=<span class="dax-str">"Yes"</span>, <span class="dax-var">I2</span>=<span class="dax-str">"Yes"</span>)<br>
+        <span class="dax-comment">// G2=Depression, H2=Anxiety, I2=Panic Attack</span>
+      </div>
+    </div>
+
+    <div class="dax-block">
+      <div class="dax-header">
+        <span class="dax-title">At least 2 — Multiple Cases</span>
+        <span class="dax-lang">EXCEL</span>
+      </div>
+      <div class="dax-body">
+        <span class="dax-comment">// TRUE if two or more conditions are present</span><br>
+        =(<span class="dax-fn">COUNTIF</span>(<span class="dax-var">G2:I2</span>,<span class="dax-str">"Yes"</span>)&gt;=2)<br>
+        <span class="dax-comment">// Counts "Yes" values across the three condition columns</span><br>
+        <span class="dax-comment">// Returns TRUE when count is 2 or more</span>
+      </div>
+    </div>
+
+    <div class="dax-block">
+      <div class="dax-header">
+        <span class="dax-title">All three — Complex Cases</span>
+        <span class="dax-lang">EXCEL</span>
+      </div>
+      <div class="dax-body">
+        <span class="dax-comment">// TRUE only when all three conditions are simultaneously present</span><br>
+        =<span class="dax-fn">AND</span>(<span class="dax-var">G2</span>=<span class="dax-str">"Yes"</span>, <span class="dax-var">H2</span>=<span class="dax-str">"Yes"</span>, <span class="dax-var">I2</span>=<span class="dax-str">"Yes"</span>)<br>
+        <span class="dax-comment">// Highest severity tier — flags compounded psychological burden</span>
+      </div>
+    </div>
+
+    <h3>DAX — Proportional Prevalence (Power BI)</h3>
+    <p>Raw counts alone would have been misleading — Year 1 has 43 students while Year 4 has only 8. DAX measures were written to calculate <em>within-cohort prevalence</em>, making year-on-year comparison valid.</p>
+
+    <div class="dax-block">
+      <div class="dax-header">
+        <span class="dax-title">Prevalence % Within Year of Study</span>
+        <span class="dax-lang">DAX</span>
+      </div>
+      <div class="dax-body">
+        <span class="dax-comment">// % of students in the current year filter with any condition</span><br>
+        <span class="dax-kw">Prevalence % =</span><br>
+        &nbsp;&nbsp;<span class="dax-fn">DIVIDE</span>(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="dax-fn">CALCULATE</span>(<span class="dax-fn">COUNTROWS</span>(<span class="dax-var">Students</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dax-var">Students</span>[At least 1] = <span class="dax-str">TRUE</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="dax-fn">COUNTROWS</span>(<span class="dax-var">Students</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;0<br>
+        &nbsp;&nbsp;)<br>
+        <span class="dax-comment">// Context-aware: responds to Year of Study slicer</span><br>
+        <span class="dax-comment">// DIVIDE with 0 fallback prevents division errors on empty filters</span>
+      </div>
+    </div>
+
+    <div class="dax-block">
+      <div class="dax-header">
+        <span class="dax-title">Complex Cases Count (DAX)</span>
+        <span class="dax-lang">DAX</span>
+      </div>
+      <div class="dax-body">
+        <span class="dax-comment">// Conditional count — only rows where all three = TRUE</span><br>
+        <span class="dax-kw">Complex Cases =</span><br>
+        &nbsp;&nbsp;<span class="dax-fn">CALCULATE</span>(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="dax-fn">COUNTROWS</span>(<span class="dax-var">Students</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="dax-var">Students</span>[All three] = <span class="dax-str">TRUE</span><br>
+        &nbsp;&nbsp;)
+      </div>
+    </div>
+  </section>
+
+  <!-- INSIGHTS -->
+  <section class="section">
+    <div class="sec-tag">05 key insights</div>
+    <h2>Year 3 is the highest-risk cohort — but raw counts hid it</h2>
+
+    <div class="alert">
+      <div class="alert-title">⚠ CRITICAL FINDING</div>
+      <p>Year 1 had the largest raw case count (25 students). Without proportional normalisation, this looks like the most at-risk cohort. Proportional analysis tells the opposite story — Year 3 carries the highest burden at 75% prevalence.</p>
+    </div>
+
+    <h3>Cohort-by-Cohort Breakdown</h3>
+    <table class="cohort-table">
+      <thead>
+        <tr>
+          <th>Cohort</th>
+          <th>n</th>
+          <th>Any Condition</th>
+          <th>Multiple Cases</th>
+          <th>Complex Cases</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="yr-label">Year 1</span></td>
+          <td>43</td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-teal" style="width:58.1%;animation-delay:0.1s"></div></div>
+              <span class="pct-val" style="color:var(--teal)">58.1%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-amber" style="width:30.2%;animation-delay:0.2s"></div></div>
+              <span class="pct-val" style="color:var(--amber)">30.2%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-red" style="width:9.3%;animation-delay:0.3s"></div></div>
+              <span class="pct-val" style="color:var(--red)">9.3%</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="yr-label">Year 2</span></td>
+          <td>26</td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-teal" style="width:73.1%;animation-delay:0.2s"></div></div>
+              <span class="pct-val" style="color:var(--teal)">73.1%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-amber" style="width:26.9%;animation-delay:0.3s"></div></div>
+              <span class="pct-val" style="color:var(--amber)">26.9%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-red" style="width:7.7%;animation-delay:0.4s"></div></div>
+              <span class="pct-val" style="color:var(--red)">7.7%</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="yr-label">Year 3</span></td>
+          <td>24</td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-teal" style="width:75%;animation-delay:0.3s"></div></div>
+              <span class="pct-val" style="color:var(--teal)">75.0%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-amber" style="width:29.2%;animation-delay:0.4s"></div></div>
+              <span class="pct-val" style="color:var(--amber)">29.2%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-red" style="width:12.5%;animation-delay:0.5s"></div></div>
+              <span class="pct-val" style="color:var(--red)">12.5%</span>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td><span class="yr-label">Year 4</span></td>
+          <td style="color:var(--muted)">8 ⚠</td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-teal" style="width:25%;animation-delay:0.4s"></div></div>
+              <span class="pct-val" style="color:var(--teal)">25.0%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-amber" style="width:12.5%;animation-delay:0.5s"></div></div>
+              <span class="pct-val" style="color:var(--amber)">12.5%</span>
+            </div>
+          </td>
+          <td>
+            <div class="pct-bar-wrap">
+              <div class="pct-bar-track"><div class="pct-bar-fill fill-red" style="width:12.5%;animation-delay:0.6s"></div></div>
+              <span class="pct-val" style="color:var(--red)">12.5%</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;">⚠ Year 4 n=8. Low sample size limits generalisability — interpret with caution.</p>
+
+    <div class="insight-strip" style="margin-top:28px;">
+      <div class="insight-card">
+        <div class="insight-val">75%</div>
+        <div class="insight-label">Year 3 any-condition prevalence — the highest risk point in the academic journey</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-val amber">63.4%</div>
+        <div class="insight-label">Overall cohort prevalence — nearly 2 in 3 students report at least one condition</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-val red">6 / 64</div>
+        <div class="insight-label">Only 6 of 64 affected students sought specialist care — a significant treatment gap</div>
+      </div>
+    </div>
+
+    <h3>Academic Performance Is Not the Filter</h3>
+    <p>CGPA segmentation shows that psychological burden is not isolated to lower-performing students. The highest concentration of students sits in the 3.00–4.00 CGPA range — and conditions are present across all tiers. Stress exposure is cross-performance, which means targeting only low-CGPA students for support would miss the majority of cases.</p>
+  </section>
+
+  <!-- RECOMMENDATIONS -->
+  <section class="section">
+    <div class="sec-tag">06 recommendations</div>
+    <h2>Five evidence-based interventions</h2>
+    <ul class="rec-list">
+      <li><strong>Front-load prevention in Year 1.</strong> Implement structured screening at entry level before accumulation begins. The data shows escalation is progressive — intervening at Year 1 disrupts the pathway to Year 3 complexity.</li>
+      <li><strong>Concentrate counselling resources on Year 2 and Year 3.</strong> These cohorts show the steepest proportional burden. Mid-progression is the highest-risk zone, not the entry point.</li>
+      <li><strong>Establish a monitoring protocol for Complex Cases.</strong> The 10 students carrying all three conditions simultaneously need prioritised, structured support — not standard triage.</li>
+      <li><strong>Adopt universal screening, not CGPA-based targeting.</strong> Psychological burden appears across all academic performance tiers. A performance-gated support model would exclude the majority of students who need it.</li>
+      <li><strong>Close the specialist care gap.</strong> Only 6 of 64 affected students accessed specialist treatment. Reducing friction — awareness, referral pathways, stigma — could significantly improve outcomes.</li>
+    </ul>
+  </section>
+
+  <!-- CONCLUSION -->
+  <section class="section">
+    <div class="sec-tag">07 conclusion</div>
+    <h2>This is a risk segmentation model, not a chart</h2>
+    <p>The core contribution of this project is methodological. By combining Excel-based severity engineering with DAX-driven proportional analysis in Power BI, the work moves beyond descriptive dashboarding into structured risk identification.</p>
+    <p>The finding that Year 3 represents the peak risk cohort — not Year 1, which had the highest raw count — would have been invisible without normalisation. That distinction is the difference between resource allocation that works and resource allocation that misses the problem entirely.</p>
+  </section>
+
+</div><!-- end page-body -->
+
+<!-- DOWNLOADS -->
+<section class="download-section">
+  <div class="dl-inner">
+    <div class="sec-tag" style="margin-bottom:12px;">project files</div>
+    <h2>Access the full project</h2>
+    <p>// download source files to explore the dataset, dashboard, and full report</p>
+    <div class="dl-grid">
+      <a href="#" class="dl-btn">
+        <span class="dl-icon">📊</span>
+        <span class="dl-title">Power BI Dashboard</span>
+        <span class="dl-sub">.pbix — Desktop</span>
+      </a>
+      <a href="#" class="dl-btn">
+        <span class="dl-icon">📑</span>
+        <span class="dl-title">Dashboard Export</span>
+        <span class="dl-sub">.pdf — Power BI</span>
+      </a>
+      <a href="#" class="dl-btn">
+        <span class="dl-icon">📄</span>
+        <span class="dl-title">Full Report</span>
+        <span class="dl-sub">.docx — Word</span>
+      </a>
+      <a href="#" class="dl-btn">
+        <span class="dl-icon">🗄</span>
+        <span class="dl-title">Cleaned Dataset</span>
+        <span class="dl-sub">.csv — Excel</span>
+      </a>
+      <a href="https://www.kaggle.com/" target="_blank" class="dl-btn">
+        <span class="dl-icon">📁</span>
+        <span class="dl-title">Raw Dataset</span>
+        <span class="dl-sub">Kaggle — source</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© Kehinde Odewabi · Data Analyst</p>
+  <a href="index.html">← back to all projects</a>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.07 });
+
+  document.querySelectorAll('.section').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
