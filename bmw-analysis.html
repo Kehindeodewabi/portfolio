@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMW Used Cars — SQL Analysis · Kehinde Odewabi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #c8a96e;
+      --accent2: #e8c98e;
+      --text: #e8e4dc;
+      --muted: #7a7570;
+      --code-bg: #111;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,13,13,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    nav a:first-child { color: var(--accent); font-weight: 500; }
+    nav a:hover { color: var(--text); }
+    nav span { color: var(--border); }
+
+    /* HERO */
+    .hero {
+      padding: 5rem 2rem 3rem;
+      max-width: 900px;
+      margin: 0 auto;
+      animation: fadeUp 0.7s ease both;
+    }
+    .hero-tags {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 0.72rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.25rem 0.7rem;
+      border-radius: 2px;
+    }
+    .tag.muted {
+      color: var(--muted);
+      border-color: var(--border);
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--accent);
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.8;
+    }
+
+    /* META STRIP */
+    .meta-strip {
+      max-width: 900px;
+      margin: 0 auto 4rem;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0;
+      border: 1px solid var(--border);
+      animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .meta-item {
+      padding: 1.2rem 1.5rem;
+      border-right: 1px solid var(--border);
+    }
+    .meta-item:last-child { border-right: none; }
+    .meta-label {
+      font-size: 0.68rem;
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .meta-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      max-width: 900px;
+      margin: 0 auto 5rem;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      animation: fadeUp 0.7s 0.2s ease both;
+    }
+    .stat-box {
+      background: var(--surface);
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    /* MAIN CONTENT */
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+    }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 5rem;
+      animation: fadeUp 0.6s ease both;
+    }
+    .section-number {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .section h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .section h3 {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      margin: 2rem 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+    .section p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      line-height: 1.85;
+    }
+    .section p strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+    }
+    .code-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    pre {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #c8c0b0;
+      white-space: pre;
+    }
+    .kw  { color: #569cd6; }
+    .fn  { color: #c8a96e; }
+    .str { color: #ce9178; }
+    .cm  { color: #4a4a4a; font-style: italic; }
+    .br  { color: #9cdcfe; }
+
+    /* FINDINGS TABLE */
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.88rem;
+    }
+    .findings-table th {
+      text-align: left;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--accent);
+      font-weight: 400;
+    }
+    .findings-table td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+      vertical-align: top;
+    }
+    .findings-table td:first-child {
+      color: var(--text);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .findings-table tr:hover td { background: var(--surface2); }
+
+    /* INSIGHT CARDS */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+    .insight-card {
+      background: var(--surface);
+      padding: 1.5rem;
+    }
+    .insight-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+    .insight-card h4 {
+      font-size: 0.82rem;
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      font-weight: 400;
+    }
+    .insight-card p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0;
+    }
+    .insight-card .big-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--accent2);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    /* FILES */
+    .files-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      margin-top: 4rem;
+    }
+    .files-section h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .files-section p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .file-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .file-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.2rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .file-link:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(200,169,110,0.05);
+    }
+    .file-link.primary {
+      background: var(--accent);
+      color: #0d0d0d;
+      border-color: var(--accent);
+      font-weight: 500;
+    }
+    .file-link.primary:hover {
+      background: var(--accent2);
+      border-color: var(--accent2);
+      color: #0d0d0d;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .meta-strip { grid-template-columns: 1fr 1fr; }
+      .meta-item { border-right: none; border-bottom: 1px solid var(--border); }
+      nav { padding: 0.85rem 1rem; }
+      .hero, .content { padding-left: 1rem; padding-right: 1rem; }
+      .meta-strip, .stats-row { margin-left: 1rem; margin-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="https://kehindeodewabi.github.io/portfolio/index.html">Kehinde Odewabi</a>
+    <span>·</span>
+    <a href="https://kehindeodewabi.github.io/portfolio/index.html">← All Projects</a>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-tags">
+      <span class="tag">SQL Server</span>
+      <span class="tag">T-SQL</span>
+      <span class="tag muted">Exploratory Analysis</span>
+      <span class="tag muted">Used Car Market</span>
+    </div>
+    <h1>BMW Used Cars<br /><em>SQL Analysis</em></h1>
+    <p>Exploratory data analysis of 10,000+ BMW used car listings — uncovering pricing anomalies, ownership costs, depreciation patterns, and transmission trends using Microsoft SQL Server.</p>
+  </div>
+
+  <div class="meta-strip">
+    <div class="meta-item">
+      <div class="meta-label">Tool</div>
+      <div class="meta-value">SQL Server (SSMS)</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Dataset</div>
+      <div class="meta-value">Kaggle — BMW</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Period</div>
+      <div class="meta-value">1996 – 2020</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Author</div>
+      <div class="meta-value">Kehinde Odewabi</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-number">10,781</div>
+      <div class="stat-label">Car Listings</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">24</div>
+      <div class="stat-label">BMW Models</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">24yrs</div>
+      <div class="stat-label">Data Span</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number">7</div>
+      <div class="stat-label">Analysis Sections</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- SECTION 1 -->
+    <div class="section">
+      <div class="section-number">01 — Objective</div>
+      <h2>What Makes a BMW Cheap to Own?</h2>
+      <p>The used car market is full of traps — low sticker prices that hide high running costs, and high-mileage cars priced as if brand new. This project uses <strong>T-SQL in Microsoft SQL Server</strong> to cut through the noise across 10,781 BMW listings, answering seven core questions about pricing, tax, depreciation, mileage, transmission, engine size, and fuel efficiency.</p>
+      <p>The central question: <strong>which BMW models offer the best value — not just at purchase, but over years of ownership?</strong></p>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="section">
+      <div class="section-number">02 — Price Anomalies</div>
+      <h2>Anomalies & Outliers</h2>
+      <p>Before any analysis, the data was interrogated for anomalies — cars priced inconsistently with their age and mileage. Two queries surface the outliers:</p>
+
+      <h3>A. Older Cars Priced Unusually High</h3>
+      <div class="code-block">
+        <div class="code-label">T-SQL — Top 20 Most Expensive</div>
+        <pre><span class="kw">SELECT</span> <span class="fn">TOP</span> 20 model, [year], price
+<span class="kw">FROM</span> Bmw
+<span class="kw">ORDER BY</span> price <span class="kw">DESC</span></pre>
+      </div>
+
+      <h3>B. Low Mileage Cars Priced Unusually Low</h3>
+      <div class="code-block">
+        <div class="code-label">T-SQL — Low Mileage, Low Price</div>
+        <pre><span class="kw">SELECT</span> <span class="fn">TOP</span> 20 model, [year], price, mileage
+<span class="kw">FROM</span> Bmw
+<span class="kw">ORDER BY</span> mileage <span class="kw">ASC</span></pre>
+      </div>
+      <p>Low-mileage cars priced at the bottom of the market are candidates for further investigation — potential data errors, fleet vehicles, or genuine bargains worth isolating.</p>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="section">
+      <div class="section-number">03 — Tax & Ownership Cost</div>
+      <h2>Cheapest Models to Own</h2>
+      <p>Road tax is a recurring annual cost. Combined with purchase price, it gives a clearer picture of long-term ownership expense than price alone.</p>
+
+      <h3>Average Tax by Model</h3>
+      <div class="code-block">
+        <div class="code-label">T-SQL — Avg Tax per Model</div>
+        <pre><span class="kw">SELECT</span> model, <span class="fn">AVG</span>(tax) Tax
+<span class="kw">FROM</span> Bmw
+<span class="kw">GROUP BY</span> model
+<span class="kw">ORDER BY</span> Tax <span class="kw">ASC</span></pre>
+      </div>
+
+      <table class="findings-table">
+        <thead>
+          <tr><th>Model</th><th>Avg Annual Tax</th><th>Verdict</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>i3</td><td>£38</td><td>Cheapest to tax — electric advantage</td></tr>
+          <tr><td>i8</td><td>£80</td><td>Hybrid efficiency reflected in tax</td></tr>
+          <tr><td>1 Series</td><td>£109</td><td>Lowest among petrol/diesel models</td></tr>
+          <tr><td>M3</td><td>£326</td><td>Performance tax premium</td></tr>
+          <tr><td>M6</td><td>£508</td><td>Most expensive to tax annually</td></tr>
+        </tbody>
+      </table>
+
+      <h3>10-Year Ownership Cost</h3>
+      <p>By multiplying annual tax by 10 and adding purchase price, a true long-term cost emerges:</p>
+      <div class="code-block">
+        <div class="code-label">T-SQL — 10-Year Total Cost</div>
+        <pre><span class="kw">SELECT</span> <span class="fn">TOP</span> 20 model, [year], tax, price,
+       (price + (tax * 10)) [Total Cost]
+<span class="kw">FROM</span> Bmw
+<span class="kw">GROUP BY</span> model, [year], tax, price
+<span class="kw">ORDER BY</span> [Total Cost]</pre>
+      </div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <div class="section">
+      <div class="section-number">04 — Transmission Analysis</div>
+      <h2>Transmission Trends Over Time</h2>
+      <p>Which transmission type dominates each year — and is that shifting over time? A subquery with <strong>RANK()</strong> isolates the most common transmission per year without guessing alphabetically.</p>
+
+      <div class="code-block">
+        <div class="code-label">T-SQL — Dominant Transmission Per Year (Subquery + RANK)</div>
+        <pre><span class="kw">SELECT</span> [year], transmission <span class="kw">AS</span> [Highest Transmission],
+       [Transmission Count]
+<span class="kw">FROM</span>
+  (
+    <span class="kw">SELECT</span> [year], transmission,
+           <span class="fn">COUNT</span>(transmission) [Transmission Count],
+           <span class="fn">RANK</span>() <span class="kw">OVER</span>(<span class="kw">PARTITION BY</span> [year]
+                        <span class="kw">ORDER BY</span> <span class="fn">COUNT</span>(transmission) <span class="kw">DESC</span>) <span class="kw">AS</span> [Rank]
+    <span class="kw">FROM</span> Bmw
+    <span class="kw">GROUP BY</span> [year], transmission
+  ) <span class="kw">AS</span> [Transmission Figures]
+<span class="kw">WHERE</span> [Rank] = 1
+<span class="kw">ORDER BY</span> [year]</pre>
+      </div>
+      <p>The same RANK logic is applied <strong>by model</strong> (section 4B) to find each model's most common transmission type — giving a cleaner answer than <code>MAX(transmission)</code>, which returns the alphabetically last value rather than the most frequent.</p>
+    </div>
+
+    <!-- SECTION 5 -->
+    <div class="section">
+      <div class="section-number">05 — Depreciation</div>
+      <h2>Which Models Hold Their Value?</h2>
+      <p>Depreciation is calculated by comparing the highest and lowest average prices per model across years — a subquery pattern that produces a single depreciation figure per model:</p>
+
+      <div class="code-block">
+        <div class="code-label">T-SQL — Total Depreciation Per Model</div>
+        <pre><span class="kw">SELECT</span> model,
+       <span class="fn">MIN</span>(Avg_Price) <span class="kw">AS</span> Lowest_Price,
+       <span class="fn">MAX</span>(Avg_Price) <span class="kw">AS</span> Highest_Price,
+       <span class="fn">MIN</span>(Avg_Price) - <span class="fn">MAX</span>(Avg_Price) <span class="kw">AS</span> Total_Depreciation
+<span class="kw">FROM</span> (
+  <span class="kw">SELECT</span> model, [year], <span class="fn">AVG</span>(price) <span class="kw">AS</span> Avg_Price
+  <span class="kw">FROM</span> Bmw
+  <span class="kw">GROUP BY</span> model, [year]
+) <span class="kw">AS</span> yearly_prices
+<span class="kw">GROUP BY</span> model
+<span class="kw">ORDER BY</span> Total_Depreciation <span class="kw">ASC</span></pre>
+      </div>
+
+      <div class="insight-grid">
+        <div class="insight-card">
+          <div class="insight-icon">📉</div>
+          <h4>Fastest Depreciating</h4>
+          <div class="big-num">£117K</div>
+          <p><strong>2 Series</strong> loses the most value across its price range — followed by M4 (£73K) and 3 Series (£71K).</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon">🏆</div>
+          <h4>Best Value Retention</h4>
+          <div class="big-num">£11K</div>
+          <p><strong>Z3 and i3</strong> hold value best — depreciating only £11K across their full range on the used market.</p>
+        </div>
+        <div class="insight-card">
+          <div class="insight-icon">⚡</div>
+          <h4>Electric Advantage</h4>
+          <div class="big-num">£38</div>
+          <p><strong>i3</strong> has the lowest annual tax at just £38 — and among the lowest depreciation. Best long-term value case.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6 -->
+    <div class="section">
+      <div class="section-number">06 — Fuel Type & Efficiency</div>
+      <h2>Diesel vs Petrol vs Electric</h2>
+      <p>Fuel type drives both running costs and resale value. The data shows a clear efficiency and tax hierarchy:</p>
+
+      <table class="findings-table">
+        <thead>
+          <tr><th>Fuel Type</th><th>Avg Annual Tax</th><th>Avg MPG</th><th>Takeaway</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Electric</td><td>£45</td><td>470.8</td><td>Lowest tax, highest efficiency</td></tr>
+          <tr><td>Hybrid</td><td>£82</td><td>156.9</td><td>Strong efficiency, moderate tax</td></tr>
+          <tr><td>Diesel</td><td>£120</td><td>57.8</td><td>Best everyday fuel economy</td></tr>
+          <tr><td>Petrol</td><td>£161</td><td>42.9</td><td>Higher tax, lower efficiency</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Diesel pays 25% less tax than petrol</strong> on average — a significant saving over multiple years. Electric and Hybrid models cut that further but come at a higher purchase price.</p>
+    </div>
+
+    <!-- SECTION 7 -->
+    <div class="section">
+      <div class="section-number">07 — Key Findings</div>
+      <h2>What the Data Reveals</h2>
+
+      <div class="insight-grid">
+        <div class="insight-card">
+          <h4>Cheapest to Own Long-Term</h4>
+          <p>The <strong>i3</strong> wins on every ownership cost metric: lowest annual tax (£38), lowest depreciation, and highest fuel efficiency.</p>
+        </div>
+        <div class="insight-card">
+          <h4>Diesel Beats Petrol on Cost</h4>
+          <p>Diesel averages <strong>£41 less per year</strong> in road tax than petrol, and 15 more miles per gallon — a meaningful saving over 5–10 years.</p>
+        </div>
+        <div class="insight-card">
+          <h4>M-Series: Buy for Fun, Not Value</h4>
+          <p>M3 and M6 carry the highest tax burden and depreciate significantly. Best for performance buyers, not value-conscious ones.</p>
+        </div>
+        <div class="insight-card">
+          <h4>Automatic Dominates</h4>
+          <p>Automatic transmission is the most common type across nearly every model year — a trend that strengthens noticeably post-2010.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- FILES -->
+    <div class="files-section">
+      <h2>Project Files</h2>
+      <p>View the full SQL script and raw dataset below. Upload your GitHub link once the repo is live.</p>
+      <div class="file-links">
+        <a href="#" class="file-link primary">🗄 SQL Script — project.sql</a>
+        <a href="#" class="file-link">📁 Raw Dataset — bmw.csv</a>
+        <a href="https://kehindeodewabi.github.io/portfolio/index.html" class="file-link">← Back to all projects</a>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© Kehinde Odewabi · Data Analyst &nbsp;·&nbsp; <a href="https://kehindeodewabi.github.io/portfolio/index.html">Portfolio</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/kehindeodewabi">LinkedIn</a></p>
+  </footer>
+
+</body>
+</html>
