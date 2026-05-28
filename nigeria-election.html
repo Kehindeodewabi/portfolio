@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nigeria Presidential Election Analysis — Kehinde Odewabi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-dark: #0a3d0a;
+    --green-mid: #1a6b1a;
+    --green-bright: #2e8b2e;
+    --green-light: #4caf50;
+    --green-pale: #e8f5e9;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --white: #f9f7f2;
+    --off-white: #f2efe8;
+    --text-dark: #1a1a0e;
+    --text-mid: #3a3a2a;
+    --text-light: #6a6a5a;
+    --border: rgba(10,61,10,0.12);
+    --shadow: 0 4px 32px rgba(10,61,10,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text-dark);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,61,10,0.97);
+    backdrop-filter: blur(12px);
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+  }
+  nav .nav-brand {
+    font-family: 'Playfair Display', serif;
+    color: var(--gold-light);
+    font-size: 1rem;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  nav .nav-links { display: flex; gap: 2rem; list-style: none; }
+  nav .nav-links a {
+    color: rgba(249,247,242,0.75);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  nav .nav-links a:hover { color: var(--gold-light); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--green-dark) 0%, #0d2e0d 40%, #162616 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: clamp(2rem, 8vw, 6rem);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(201,168,76,0.03) 60px, rgba(201,168,76,0.03) 61px);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    width: fit-content;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    max-width: 900px;
+  }
+  .hero h1 em {
+    color: var(--gold-light);
+    font-style: normal;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  .hero-meta-item {
+    display: flex; flex-direction: column;
+  }
+  .hero-meta-item span:first-child {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.7);
+  }
+  .hero-meta-item span:last-child {
+    font-size: 0.95rem;
+    color: var(--white);
+    font-weight: 400;
+  }
+  .hero-stats {
+    display: flex; flex-wrap: wrap; gap: 1px;
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    width: fit-content;
+    margin-bottom: 2rem;
+  }
+  .hero-stat {
+    padding: 1.2rem 2rem;
+    background: rgba(0,0,0,0.3);
+    display: flex; flex-direction: column;
+    min-width: 130px;
+  }
+  .hero-stat .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .hero-stat .lbl {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(249,247,242,0.6);
+    margin-top: 0.3rem;
+  }
+  .ng-flag {
+    position: absolute; top: 80px; right: clamp(1.5rem, 5vw, 4rem);
+    width: 80px; height: 53px;
+    display: flex;
+    border: 2px solid rgba(201,168,76,0.3);
+    overflow: hidden;
+    border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .ng-flag .stripe-g { width: 33.33%; background: #008751; }
+  .ng-flag .stripe-w { width: 33.33%; background: white; }
+  .ng-flag .stripe-g2 { width: 33.33%; background: #008751; }
+
+  /* MAIN CONTENT */
+  main { max-width: 900px; margin: 0 auto; padding: clamp(2rem, 5vw, 4rem) clamp(1.5rem, 5vw, 3rem); }
+
+  /* SECTIONS */
+  section { margin-bottom: 5rem; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+    margin-bottom: 0.6rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 60px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1.2rem;
+    line-height: 1.2;
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.6rem;
+  }
+  p { color: var(--text-mid); margin-bottom: 1rem; font-weight: 300; }
+  p strong { font-weight: 600; color: var(--text-dark); }
+
+  /* INSIGHT CARDS */
+  .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .insight-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--green-bright);
+  }
+  .insight-card .big-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .insight-card .label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+  .insight-card p {
+    font-size: 0.875rem;
+    color: var(--text-mid);
+    margin: 0.6rem 0 0;
+    line-height: 1.5;
+  }
+
+  /* BAR CHART */
+  .bar-chart { margin: 2rem 0; }
+  .bar-row {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .bar-row .bar-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: 100px;
+    text-align: right;
+    flex-shrink: 0;
+    color: var(--text-dark);
+  }
+  .bar-wrap {
+    flex: 1;
+    height: 28px;
+    background: var(--green-pale);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    display: flex; align-items: center;
+    padding-left: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: white;
+    transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+  .bar-apc { background: var(--green-dark); }
+  .bar-pdp { background: #c0392b; }
+  .bar-lp { background: #e67e22; }
+  .bar-nnpp { background: #8e44ad; }
+
+  /* PARTY COMPARISON TABLE */
+  .compare-table {
+    width: 100%; border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+  }
+  .compare-table th {
+    background: var(--green-dark);
+    color: var(--gold-light);
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.8rem 1rem;
+    text-align: left;
+  }
+  .compare-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-mid);
+  }
+  .compare-table tr:hover td { background: var(--green-pale); }
+  .compare-table td:first-child { font-weight: 600; color: var(--text-dark); }
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .badge-win { background: var(--green-pale); color: var(--green-dark); }
+  .badge-loss { background: #fce4e4; color: #c0392b; }
+
+  /* CANDIDATE CARDS */
+  .candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .candidate-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--off-white);
+  }
+  .candidate-card-header {
+    height: 6px;
+  }
+  .cc-apc { background: var(--green-dark); }
+  .cc-pdp { background: #c0392b; }
+  .cc-lp { background: #e67e22; }
+  .cc-nnpp { background: #8e44ad; }
+  .candidate-card-body { padding: 1.2rem; }
+  .candidate-card-body .name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+  }
+  .candidate-card-body .party-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+  .candidate-stat { margin-bottom: 0.4rem; }
+  .candidate-stat .cs-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+  }
+  .candidate-stat .cs-lbl {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  /* ZONE CHART */
+  .zone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .zone-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.2rem;
+    background: var(--off-white);
+  }
+  .zone-card h4 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.6rem;
+  }
+  .zone-party-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 0.4rem;
+  }
+  .zone-party-row .zp-name { font-size: 0.8rem; font-weight: 600; }
+  .zone-party-row .zp-val { font-size: 0.8rem; color: var(--text-light); }
+  .zone-winner { font-size: 0.7rem; font-weight: 700; color: var(--green-bright); margin-top: 0.6rem; }
+
+  /* CODE BLOCK */
+  .code-block {
+    background: #0d2010;
+    border: 1px solid rgba(46,139,46,0.3);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .code-label {
+    position: absolute; top: 0.6rem; right: 0.8rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(46,139,46,0.7);
+  }
+  .code-block pre {
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: #a8d8a8;
+    white-space: pre-wrap;
+  }
+  .code-block pre .kw { color: #81c784; font-weight: 700; }
+  .code-block pre .fn { color: #ffcc80; }
+  .code-block pre .str { color: #ef9a9a; }
+  .code-block pre .cm { color: rgba(168,216,168,0.45); font-style: italic; }
+
+  /* STEP LIST */
+  .step-list { list-style: none; margin: 1.5rem 0; }
+  .step-list li {
+    display: flex; gap: 1rem; align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    background: var(--green-dark);
+    color: var(--gold-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .step-content h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
+  .step-content p { font-size: 0.85rem; margin: 0; color: var(--text-light); }
+
+  /* DATA MODEL */
+  .model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  .table-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+  }
+  .table-card .tc-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 0.6rem;
+    border-bottom: 2px solid var(--green-bright);
+    padding-bottom: 0.4rem;
+  }
+  .table-card .tc-col {
+    font-size: 0.72rem;
+    color: var(--text-light);
+    margin-bottom: 0.2rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .tc-icon { color: var(--green-bright); font-size: 0.6rem; }
+
+  /* PREDICTION */
+  .prediction-box {
+    background: linear-gradient(135deg, var(--green-dark), #1a3a1a);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .prediction-box::before {
+    content: '2027';
+    position: absolute; right: -10px; top: -30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(201,168,76,0.07);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .prediction-box h3 {
+    color: var(--gold-light);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+  .prediction-box p {
+    color: rgba(249,247,242,0.8);
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+  }
+  .prediction-item {
+    display: flex; align-items: flex-start; gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    padding: 0.8rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    border-left: 3px solid var(--gold);
+  }
+  .prediction-item .pi-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .prediction-item p { margin: 0; color: rgba(249,247,242,0.85); font-size: 0.875rem; }
+  .prediction-item strong { color: var(--gold-light); }
+
+  /* FILES */
+  .files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  .file-link {
+    display: flex; align-items: center; gap: 0.8rem;
+    padding: 1rem 1.2rem;
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: all 0.2s;
+  }
+  .file-link:hover {
+    background: var(--green-pale);
+    border-color: var(--green-bright);
+    transform: translateY(-2px);
+  }
+  .file-icon {
+    width: 36px; height: 36px;
+    background: var(--green-dark);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .file-link .fl-text { display: flex; flex-direction: column; }
+  .file-link .fl-title { font-size: 0.85rem; font-weight: 600; }
+  .file-link .fl-sub { font-size: 0.7rem; color: var(--text-light); margin-top: 0.1rem; }
+
+  /* OTHER PROJECTS */
+  .projects-list { margin: 1.5rem 0; }
+  .project-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .project-item:last-child { border-bottom: none; }
+  .project-item .pi-title { font-weight: 600; font-size: 0.9rem; }
+  .project-item .pi-tag {
+    font-size: 0.7rem;
+    background: var(--green-pale);
+    color: var(--green-dark);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .project-item a {
+    font-size: 0.8rem;
+    color: var(--green-bright);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .project-item a:hover { text-decoration: underline; }
+
+  /* CALLOUT */
+  .callout {
+    background: var(--green-pale);
+    border-left: 4px solid var(--green-bright);
+    border-radius: 0 6px 6px 0;
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+    color: var(--text-mid);
+  }
+  .callout strong { color: var(--green-dark); }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--green-dark);
+    color: rgba(249,247,242,0.6);
+    text-align: center;
+    padding: 2rem;
+    font-size: 0.8rem;
+    margin-top: 4rem;
+  }
+  footer a { color: var(--gold-light); text-decoration: none; }
+
+  /* SCROLL ANIMATION */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.7s ease both; }
+
+  @media (max-width: 600px) {
+    nav .nav-links { display: none; }
+    .hero-stats { flex-direction: column; }
+    .hero-stat { min-width: unset; }
+    .compare-table { font-size: 0.8rem; }
+    .compare-table th, .compare-table td { padding: 0.6rem 0.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://kehindeodewabi.github.io/portfolio/index.html" class="nav-brand">Kehinde Odewabi</a>
+  <ul class="nav-links">
+    <li><a href="https://kehindeodewabi.github.io/portfolio/index.html">← All Projects</a></li>
+    <li><a href="#findings">Findings</a></li>
+    <li><a href="#method">Method</a></li>
+    <li><a href="#prediction">Prediction</a></li>
+    <li><a href="#files">Files</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="ng-flag">
+    <div class="stripe-g"></div>
+    <div class="stripe-w"></div>
+    <div class="stripe-g2"></div>
+  </div>
+  <div class="hero-tag">Power BI · Data Analysis · Excel</div>
+  <h1>Nigeria Presidential<br><em>Election Analysis</em></h1>
+  <div class="hero-meta">
+    <div class="hero-meta-item">
+      <span>Elections Covered</span>
+      <span>2019 &amp; 2023</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Parties Analysed</span>
+      <span>Top 4 per Election</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Tool</span>
+      <span>Power BI + Excel</span>
+    </div>
+    <div class="hero-meta-item">
+      <span>Author</span>
+      <span>Kehinde Odewabi</span>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <span class="val">422M</span>
+      <span class="lbl">Total Population</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val">177.5M</span>
+      <span class="lbl">Registered Voters</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val">160M</span>
+      <span class="lbl">PVCs Collected</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val">50M</span>
+      <span class="lbl">Top 4 Votes Cast</span>
+    </div>
+    <div class="hero-stat">
+      <span class="val">APC</span>
+      <span class="lbl">2023 Winner</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- 01 OBJECTIVE -->
+  <section id="objective">
+    <div class="section-label">01 — Objective</div>
+    <h2>Understanding how Nigeria votes — and what changed between 2019 and 2023</h2>
+    <p>Nigeria is Africa's most populous country and one of its most complex democracies. Presidential elections here are not just contests between candidates — they are reflections of ethnic geography, regional loyalty, voter mobilisation, and shifting political winds across 36 states and the FCT.</p>
+    <p>This project analyses two consecutive presidential elections (2019 and 2023) using official data from INEC, population projections from the National Bureau of Statistics (NBS), and voter registration records. The focus is on the <strong>top 4 parties</strong> per election — the only parties for whom complete, verifiable state-level data is available.</p>
+    <p>The central questions: <strong>How did voter participation change?</strong> Who won where, and why? And what do the patterns suggest about 2027?</p>
+  </section>
+
+  <!-- 02 DATA SOURCES -->
+  <section id="sources">
+    <div class="section-label">02 — Data Sources</div>
+    <h2>Where the data came from</h2>
+    <p>This analysis draws from four primary official sources, supplemented with publicly available candidate biographies:</p>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>INEC 2023 General Election Report (Official)</h4>
+          <p>The Independent National Electoral Commission's official published report on the 2023 presidential election. Source for all 2023 state-level vote counts, accredited voters, and election administration data.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>NBS Demographic Statistics Bulletin 2020</h4>
+          <p>Published by the National Bureau of Statistics. Used for population projections relevant to the 2019 election cycle and voter registration rate calculations by state.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>NBS Demographic Bulletin 2023</h4>
+          <p>The most recent NBS demographic publication. Provided the 2023 projected population of 221.25 million and state-level breakdowns used in the demographics dashboard.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>INEC Voter Registration Records (2019 &amp; 2023)</h4>
+          <p>State-level registered voter counts, PVC collection figures, and gender breakdown of registrants. Some supplementary figures verified against reputable news sources including Vanguard Nigeria.</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <strong>Note on party scope:</strong> This analysis covers the top 4 parties only — APC, PDP, PCP, ADC in 2019; and APC, PDP, LP, NNPP in 2023. Vote totals for other parties were either unavailable or incomplete at the state level and have been excluded to preserve analytical integrity.
+    </div>
+  </section>
+
+  <!-- 03 DATA PREP -->
+  <section id="method">
+    <div class="section-label">03 — Data Preparation</div>
+    <h2>Cleaning, structuring, and modelling the data</h2>
+    <p>Raw election and demographic data was collected from multiple sources and required significant cleaning and restructuring before it could be loaded into Power BI. All preparation was done in <strong>Microsoft Excel</strong> and shaped further using <strong>Power Query (M language)</strong> within Power BI Desktop.</p>
+
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Excel Consolidation</h4>
+          <p>Multiple source tables were built in Excel: a Main Table combining election results with registration and population data for both years, an Age Distribution table, a PVC Collection table, a Party Details table with candidate biographies, and a Population Projections table.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Power Query — Unpivot &amp; Join</h4>
+          <p>The Party Votes Table was created by unpivoting party columns from the Main Table, transforming a wide format into a long format where each row = one state × one party × one year. This enabled clean party-level filtering in Power BI. A left join was then used to append the Country column from the Main Table.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Power Query — Age &amp; Biography Tables</h4>
+          <p>Blank rows and null columns were removed from the Age sheet before promoting headers and setting column types. The Biography table was loaded and renamed for consistency.</p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Data Model &amp; Relationships</h4>
+          <p>Six tables were related in the Power BI data model: Main Table, Party Votes Table, Dim Party, Dim Year, Age, and Biography. Year and State served as the primary join keys across tables.</p>
+        </div>
+      </li>
+    </ul>
+
+    <h3>Data Model Overview</h3>
+    <div class="model-grid">
+      <div class="table-card">
+        <div class="tc-name">Main Table</div>
+        <div class="tc-col"><span class="tc-icon">🔑</span> Year, State, Zone</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Population, Registration</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> PVC Collected/Uncollected</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> APC, PDP, LP, NNPP votes</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Winner, Accredited Votes</div>
+      </div>
+      <div class="table-card">
+        <div class="tc-name">Party Votes Table</div>
+        <div class="tc-col"><span class="tc-icon">🔑</span> Year, State, Party</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Votes</div>
+        <div class="tc-col"><span class="tc-icon">🔗</span> Joined from Main Table</div>
+      </div>
+      <div class="table-card">
+        <div class="tc-name">Dim Party</div>
+        <div class="tc-col"><span class="tc-icon">🔑</span> Party</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Year, Full Name</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Candidate, Logo URL</div>
+      </div>
+      <div class="table-card">
+        <div class="tc-name">Dim Year</div>
+        <div class="tc-col"><span class="tc-icon">🔑</span> Year (2019, 2023)</div>
+        <div class="tc-col"><span class="tc-icon">🔗</span> Filter table</div>
+      </div>
+      <div class="table-card">
+        <div class="tc-name">Age</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Year</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Young Adults (18–50)</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Elderly (51–70)</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Old (70+)</div>
+      </div>
+      <div class="table-card">
+        <div class="tc-name">Biography</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Party, Year, Candidate</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Biography text</div>
+        <div class="tc-col"><span class="tc-icon">📊</span> Image URLs</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;">Key DAX Measures</h3>
+    <p>The following DAX measures were written to power the dashboard visuals and KPI cards:</p>
+
+    <div class="code-block">
+      <span class="code-label">DAX</span>
+      <pre><span class="cm">-- Dynamically identifies the winning party per state/year</span>
+<span class="kw">Winning Party</span> =
+<span class="kw">VAR</span> APCVotes = <span class="fn">SUM</span>('Main Table'[APC])
+<span class="kw">VAR</span> PDPVotes = <span class="fn">SUM</span>('Main Table'[PDP])
+<span class="kw">VAR</span> LPVotes  = <span class="fn">SUM</span>('Main Table'[LP])
+<span class="kw">VAR</span> NNPPVotes = <span class="fn">SUM</span>('Main Table'[NNPP])
+<span class="kw">VAR</span> MaxVotes = <span class="fn">MAXX</span>({APCVotes, PDPVotes, LPVotes, NNPPVotes}, [Value])
+<span class="kw">RETURN</span>
+<span class="fn">SWITCH</span>(<span class="fn">TRUE</span>(),
+    APCVotes = MaxVotes, <span class="str">"APC"</span>,
+    PDPVotes = MaxVotes, <span class="str">"PDP"</span>,
+    LPVotes  = MaxVotes, <span class="str">"LP"</span>,
+    NNPPVotes = MaxVotes, <span class="str">"NNPP"</span>
+)</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="code-label">DAX</span>
+      <pre><span class="cm">-- Calculates the winning margin between top 2 parties</span>
+<span class="kw">Winning Margin</span> =
+<span class="kw">VAR</span> PartyTable = <span class="fn">ADDCOLUMNS</span>(<span class="fn">VALUES</span>('Party Votes Table'[Party]),
+    <span class="str">"TotalVotes"</span>, <span class="fn">CALCULATE</span>(<span class="fn">SUM</span>('Party Votes Table'[Votes])))
+<span class="kw">VAR</span> TopTwo = <span class="fn">TOPN</span>(2, PartyTable, [TotalVotes], <span class="fn">DESC</span>)
+<span class="kw">VAR</span> WinnerVotes   = <span class="fn">MAXX</span>(TopTwo, [TotalVotes])
+<span class="kw">VAR</span> RunnerUpVotes = <span class="fn">MINX</span>(TopTwo, [TotalVotes])
+<span class="kw">RETURN</span>
+<span class="fn">IF</span>(<span class="fn">COUNTROWS</span>(TopTwo) < 2, <span class="fn">BLANK</span>(), WinnerVotes - RunnerUpVotes)</pre>
+    </div>
+
+    <div class="code-block">
+      <span class="code-label">DAX</span>
+      <pre><span class="cm">-- Uncollected PVC percentage</span>
+<span class="kw">Uncollected PVC %</span> =
+<span class="fn">DIVIDE</span>(
+    <span class="fn">SUM</span>('Main Table'[PVC Uncollected]),
+    <span class="fn">SUM</span>('Main Table'[Total Reg.])
+)</pre>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 03b DASHBOARD & SLICERS -->
+  <section id="dashboard">
+    <div class="section-label">03b — Dashboard & Interactivity</div>
+    <h2>How the dashboard works</h2>
+    <p>The Power BI dashboard is built across four pages — <strong>Overview, Participation, Party Analysis,</strong> and <strong>Demographics</strong>. Each page shares the same slicer panel, allowing you to slice the entire report by year, state, or zone simultaneously.</p>
+
+    <h3 style="margin-top:1.5rem;">Slicers Available</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:1rem; margin:1.5rem 0;">
+
+      <div style="background:var(--green-dark); border-radius:8px; padding:1.2rem; color:white;">
+        <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-light); margin-bottom:0.6rem;">Slicer 1</div>
+        <div style="font-size:1.1rem; font-weight:700; margin-bottom:0.4rem;">Year</div>
+        <div style="font-size:0.82rem; color:rgba(255,255,255,0.75);">Toggle between <strong style="color:var(--gold-light);">2019</strong> and <strong style="color:var(--gold-light);">2023</strong>. Every visual, KPI card, and chart on the page updates instantly to reflect the selected election year.</div>
+        <div style="margin-top:0.8rem; display:flex; gap:0.5rem;">
+          <span style="background:rgba(201,168,76,0.25); border:1px solid var(--gold); border-radius:3px; padding:0.2rem 0.7rem; font-size:0.75rem; font-weight:700; color:var(--gold-light);">2019</span>
+          <span style="background:rgba(201,168,76,0.25); border:1px solid var(--gold); border-radius:3px; padding:0.2rem 0.7rem; font-size:0.75rem; font-weight:700; color:var(--gold-light);">2023</span>
+        </div>
+      </div>
+
+      <div style="background:var(--off-white); border:1px solid var(--border); border-radius:8px; padding:1.2rem;">
+        <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--green-mid); margin-bottom:0.6rem;">Slicer 2</div>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--text-dark); margin-bottom:0.4rem;">State</div>
+        <div style="font-size:0.82rem; color:var(--text-mid);">Filter all visuals down to a <strong>single state</strong> — or multi-select to compare groups. Available on Participation and Overview pages. Useful for drilling into a state's registration rate, party performance, and PVC collection.</div>
+        <div style="margin-top:0.8rem; font-size:0.72rem; color:var(--text-light);">37 options (36 states + FCT)</div>
+      </div>
+
+      <div style="background:var(--off-white); border:1px solid var(--border); border-radius:8px; padding:1.2rem;">
+        <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--green-mid); margin-bottom:0.6rem;">Slicer 3</div>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--text-dark); margin-bottom:0.4rem;">Zone</div>
+        <div style="font-size:0.82rem; color:var(--text-mid);">Filter by Nigeria's six geopolitical zones. Selecting a zone narrows all visuals to only the states within it — revealing regional patterns in votes, registration, and PVC collection that state-level views might obscure.</div>
+        <div style="margin-top:0.8rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">N. West</span>
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">N. East</span>
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">N. Central</span>
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">S. West</span>
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">S. South</span>
+          <span style="background:var(--green-pale); color:var(--green-dark); font-size:0.68rem; font-weight:600; padding:0.15rem 0.5rem; border-radius:2px;">S. East</span>
+        </div>
+      </div>
+
+      <div style="background:var(--off-white); border:1px solid var(--border); border-radius:8px; padding:1.2rem;">
+        <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--green-mid); margin-bottom:0.6rem;">Slicer 4 — Party Analysis Page</div>
+        <div style="font-size:1.1rem; font-weight:700; color:var(--text-dark); margin-bottom:0.4rem;">Party</div>
+        <div style="font-size:0.82rem; color:var(--text-mid);">On the Party Analysis page, selecting a party loads that candidate's biography, photo, total votes, states won, strongest state, and strongest zone — all dynamically. Works in combination with the Year slicer.</div>
+        <div style="margin-top:0.8rem; display:flex; flex-wrap:wrap; gap:0.4rem;">
+          <span style="background:#0a3d0a; color:white; font-size:0.68rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:2px;">APC</span>
+          <span style="background:#c0392b; color:white; font-size:0.68rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:2px;">PDP</span>
+          <span style="background:#e67e22; color:white; font-size:0.68rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:2px;">LP</span>
+          <span style="background:#8e44ad; color:white; font-size:0.68rem; font-weight:700; padding:0.15rem 0.5rem; border-radius:2px;">NNPP</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="callout">
+      <strong>Cross-filtering is active:</strong> All slicers interact with each other. For example, selecting "South East" zone + "2023" year will filter every visual — votes per party, PVC collection, population vs registrants, candidate performance — to show only South East states in 2023.
+    </div>
+  </section>
+
+  <!-- 04 FINDINGS -->
+  <section id="findings">
+    <div class="section-label">04 — Key Findings: 2023 Results</div>
+    <h2>APC wins a fragmented election</h2>
+    <p>The 2023 presidential election was the most competitive in Nigeria's recent democratic history. For the first time, a third-party candidate (Peter Obi of LP) won multiple states, and no party crossed 50% of the total votes cast across the top 4 parties.</p>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="big-num">8.8M</div>
+        <div class="label">APC Total Votes</div>
+        <p>Bola Tinubu won with 8.8M votes — down significantly from Buhari's 15.2M in 2019, reflecting a more fragmented electorate.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">47.95%</div>
+        <div class="label">APC Share (Top 4)</div>
+        <p>APC held under 48% of the top-4-party vote share. The ruling party won, but without a dominant mandate.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">5.8M</div>
+        <div class="label">Winning Margin</div>
+        <p>APC beat PDP by approximately 5.8 million votes — smaller than the 2019 margin of 3.9M over PDP.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">11.8%</div>
+        <div class="label">Votes-to-Population Ratio</div>
+        <p>Only 11.8% of Nigeria's total population actually cast a vote — a stark illustration of the participation gap from registration to ballot.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;">2023 Vote Share (Top 4 Parties)</h3>
+    <p>Percentages below are calculated as a share of the <strong>top 4 parties' combined votes (23.4M)</strong>.</p>
+    <div class="bar-chart">
+      <div class="bar-row">
+        <span class="bar-label">APC</span>
+        <div class="bar-wrap"><div class="bar-fill bar-apc" style="width:47.95%">47.95% — 8.8M</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">PDP</span>
+        <div class="bar-wrap"><div class="bar-fill bar-pdp" style="width:36.46%">36.46% — 7.0M</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">LP</span>
+        <div class="bar-wrap"><div class="bar-fill bar-lp" style="width:26.08%">26.08% — 6.1M</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">NNPP</span>
+        <div class="bar-wrap"><div class="bar-fill bar-nnpp" style="width:6.4%">6.40% — 1.5M</div></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;">2019 Vote Share (Top 4 Parties)</h3>
+    <p>Percentages below are calculated as a share of the <strong>top 4 parties' combined votes (26.7M)</strong>. The 2019 race was essentially a two-party contest — APC and PDP together held over 99% of the top 4 vote. PCP and ADC were included as the only other parties with complete verified state-level data, but their share was negligible.</p>
+    <div class="bar-chart">
+      <div class="bar-row">
+        <span class="bar-label">APC</span>
+        <div class="bar-wrap"><div class="bar-fill bar-apc" style="width:56.98%">56.98% — 15.2M</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">PDP</span>
+        <div class="bar-wrap"><div class="bar-fill bar-pdp" style="width:42.25%">42.25% — 11.3M</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">PCP</span>
+        <div class="bar-wrap"><div class="bar-fill" style="width:2%; background:#7f8c8d; min-width:90px;">0.40% — 107K</div></div>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">ADC</span>
+        <div class="bar-wrap"><div class="bar-fill" style="width:2%; background:#95a5a6; min-width:90px;">0.37% — 98K</div></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:1rem;">
+      <strong>Note on PCP & ADC:</strong> Their combined share of just 0.77% of the top 4 vote confirms they had no meaningful impact on the 2019 outcome. They are included for completeness — these were the only other parties with full, verified state-level data. In 2023, they were replaced by LP and NNPP as credible third and fourth parties.
+    </div>
+
+    <h3 style="margin-top:2rem;">2019 Candidates at a Glance</h3>
+    <div class="candidates-grid">
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-apc"></div>
+        <div class="candidate-card-body">
+          <div class="name">Muhammadu Buhari</div>
+          <div class="party-tag" style="color:var(--green-dark);">APC — Winner ✓</div>
+          <div class="candidate-stat"><div class="cs-val">15.2M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">56.98%</div><div class="cs-lbl">Top 4 Share</div></div>
+          <div class="candidate-stat"><div class="cs-val">North West</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-pdp"></div>
+        <div class="candidate-card-body">
+          <div class="name">Atiku Abubakar</div>
+          <div class="party-tag" style="color:#c0392b;">PDP — 2nd Place</div>
+          <div class="candidate-stat"><div class="cs-val">11.3M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">42.25%</div><div class="cs-lbl">Top 4 Share</div></div>
+          <div class="candidate-stat"><div class="cs-val">North East</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header" style="height:6px; background:#7f8c8d;"></div>
+        <div class="candidate-card-body">
+          <div class="name">Felix Nicolas</div>
+          <div class="party-tag" style="color:#7f8c8d;">PCP — 3rd Place</div>
+          <div class="candidate-stat"><div class="cs-val">107,286</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">0.40%</div><div class="cs-lbl">Top 4 Share</div></div>
+          <div class="candidate-stat"><div class="cs-val">South West</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header" style="height:6px; background:#95a5a6;"></div>
+        <div class="candidate-card-body">
+          <div class="name">Obadiah Mailafia</div>
+          <div class="party-tag" style="color:#95a5a6;">ADC — 4th Place</div>
+          <div class="candidate-stat"><div class="cs-val">97,874</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">0.37%</div><div class="cs-lbl">Top 4 Share</div></div>
+          <div class="candidate-stat"><div class="cs-val">South West</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem;">2023 Candidates at a Glance</h3>
+    <div class="candidates-grid">
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-apc"></div>
+        <div class="candidate-card-body">
+          <div class="name">Bola Tinubu</div>
+          <div class="party-tag" style="color:var(--green-dark);">APC — Winner ✓</div>
+          <div class="candidate-stat"><div class="cs-val">8.8M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">12</div><div class="cs-lbl">States Won</div></div>
+          <div class="candidate-stat"><div class="cs-val">South West</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-pdp"></div>
+        <div class="candidate-card-body">
+          <div class="name">Atiku Abubakar</div>
+          <div class="party-tag" style="color:#c0392b;">PDP — 2nd Place</div>
+          <div class="candidate-stat"><div class="cs-val">7.0M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">12</div><div class="cs-lbl">States Won</div></div>
+          <div class="candidate-stat"><div class="cs-val">North East</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-lp"></div>
+        <div class="candidate-card-body">
+          <div class="name">Peter Obi</div>
+          <div class="party-tag" style="color:#e67e22;">LP — 3rd Place</div>
+          <div class="candidate-stat"><div class="cs-val">6.1M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">12</div><div class="cs-lbl">States Won</div></div>
+          <div class="candidate-stat"><div class="cs-val">South East</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+      <div class="candidate-card">
+        <div class="candidate-card-header cc-nnpp"></div>
+        <div class="candidate-card-body">
+          <div class="name">Rabiu Kwankwaso</div>
+          <div class="party-tag" style="color:#8e44ad;">NNPP — 4th Place</div>
+          <div class="candidate-stat"><div class="cs-val">1.5M</div><div class="cs-lbl">Votes</div></div>
+          <div class="candidate-stat"><div class="cs-val">1</div><div class="cs-lbl">State Won</div></div>
+          <div class="candidate-stat"><div class="cs-val">North West</div><div class="cs-lbl">Strongest Zone</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 ZONE BREAKDOWN -->
+  <section id="zones">
+    <div class="section-label">05 — Regional Breakdown</div>
+    <h2>Geography still shapes voting patterns</h2>
+    <p>The zonal vote data reveals how deeply regional the 2023 outcome was. North West delivered the most total votes. South East was almost entirely captured by LP. South West went to APC's home territory.</p>
+
+    <div class="zone-grid">
+      <div class="zone-card">
+        <h4>North West — 6.6M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">2.65M (40%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">2.33M (35%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">NNPP</span><span class="zp-val">1.27M (19%)</span></div>
+        <div class="zone-winner">🏆 APC — Most contested zone</div>
+      </div>
+      <div class="zone-card">
+        <h4>North Central — 4.4M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">1.76M (40%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">LP</span><span class="zp-val">1.42M (32%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">1.16M (26%)</span></div>
+        <div class="zone-winner">🏆 APC — LP strongly competitive</div>
+      </div>
+      <div class="zone-card">
+        <h4>South West — 4.1M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">2.28M (56%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">0.94M (23%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">LP</span><span class="zp-val">0.85M (21%)</span></div>
+        <div class="zone-winner">🏆 APC — Tinubu's home territory</div>
+      </div>
+      <div class="zone-card">
+        <h4>North East — 3.4M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">1.74M (52%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">1.19M (35%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">LP</span><span class="zp-val">0.32M (10%)</span></div>
+        <div class="zone-winner">🏆 PDP — Atiku's stronghold</div>
+      </div>
+      <div class="zone-card">
+        <h4>South South — 2.75M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">LP</span><span class="zp-val">1.21M (44%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">0.80M (29%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">0.72M (26%)</span></div>
+        <div class="zone-winner">🏆 LP — Peter Obi's wider reach</div>
+      </div>
+      <div class="zone-card">
+        <h4>South East — 2.19M votes</h4>
+        <div class="zone-party-row"><span class="zp-name">LP</span><span class="zp-val">1.96M (90%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">PDP</span><span class="zp-val">0.09M (4%)</span></div>
+        <div class="zone-party-row"><span class="zp-name">APC</span><span class="zp-val">0.13M (6%)</span></div>
+        <div class="zone-winner">🏆 LP — Near-complete sweep</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 2019 vs 2023 COMPARISON -->
+  <section id="comparison">
+    <div class="section-label">06 — 2019 vs 2023 Comparison</div>
+    <h2>The electorate shifted — and so did the parties</h2>
+    <p>Between 2019 and 2023, Nigeria's registered voter base grew substantially, yet total votes cast actually fell. This paradox tells a story about participation, trust, and the fragmentation of the political landscape.</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>2019</th>
+          <th>2023</th>
+          <th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Registered Voters</td>
+          <td>84.0M</td>
+          <td>93.5M</td>
+          <td>+11.3%</td>
+        </tr>
+        <tr>
+          <td>Total Votes Cast (Top 4)</td>
+          <td>26.7M</td>
+          <td>23.4M</td>
+          <td>−12.4%</td>
+        </tr>
+        <tr>
+          <td>Winning Party</td>
+          <td>APC (Buhari)</td>
+          <td>APC (Tinubu)</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Winner's Votes</td>
+          <td>15.2M</td>
+          <td>8.8M</td>
+          <td>−42%</td>
+        </tr>
+        <tr>
+          <td>Winner's Vote Share</td>
+          <td>56.9%</td>
+          <td>47.9%</td>
+          <td>−9pp</td>
+        </tr>
+        <tr>
+          <td>2nd Place Party</td>
+          <td>PDP — 11.3M</td>
+          <td>PDP — 7.0M</td>
+          <td>−38%</td>
+        </tr>
+        <tr>
+          <td>New Entrant</td>
+          <td>—</td>
+          <td>LP (6.1M) / NNPP (1.5M)</td>
+          <td>🆕 Significant</td>
+        </tr>
+        <tr>
+          <td>Young Adults Share of Registrants</td>
+          <td>81.1%</td>
+          <td>75.4%</td>
+          <td>−5.7pp (absolute growth)</td>
+        </tr>
+        <tr>
+          <td>PVC Collection Rate (National)</td>
+          <td>~90.1%</td>
+          <td>~90.1%</td>
+          <td>Stable</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Key shift:</strong> 2023 was the first election where a third-party candidate (Peter Obi, LP) matched the established parties in states won. LP claimed 12 states, equal to both APC and PDP — an unprecedented performance for a party outside the traditional duopoly.
+    </div>
+  </section>
+
+  <!-- 07 PARTICIPATION -->
+  <section id="participation">
+    <div class="section-label">07 — Voter Participation</div>
+    <h2>Registration is rising. Turnout is not.</h2>
+    <p>One of the most striking findings of this analysis is the persistent gap between how many Nigerians are registered to vote and how many actually do. Across both elections, only a fraction of eligible citizens translated registration into a ballot.</p>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="big-num">9.85%</div>
+        <div class="label">Uncollected PVCs (National)</div>
+        <p>Nearly 1 in 10 registered voters did not collect their Permanent Voter Card in 2023 — a direct barrier to participation.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">52.66%</div>
+        <div class="label">Male Registrants</div>
+        <p>Men make up the slight majority of registered voters. Female registration (47.34%) has been growing election-over-election.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">North West</div>
+        <div class="label">Most Populous &amp; Highest Voting Zone</div>
+        <p>North West dominates both population and total votes cast, driven largely by Kano State, Nigeria's most populous state.</p>
+      </div>
+      <div class="insight-card">
+        <div class="big-num">75.4%</div>
+        <div class="label">Young Adults (18–50) Share of Registrants</div>
+        <p>In 2023, three-quarters of all registered voters were young adults — confirming that youth demographic holds the democratic key to Nigeria's future.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- 08 PREDICTION -->
+  <section id="prediction">
+    <div class="section-label">08 — Looking Ahead</div>
+    <h2>What the data suggests about 2027</h2>
+    <div class="prediction-box">
+      <h3>2027 Election Projection</h3>
+      <p>Based on the trends observed across 2019 and 2023 — and factoring in current political developments in Nigeria — the following patterns are likely to shape the 2027 contest:</p>
+
+      <div class="prediction-item">
+        <span class="pi-icon">🟢</span>
+        <p><strong>APC remains the incumbent advantage,</strong> but Tinubu's government faces significant pressure from economic hardship, fuel subsidy removal fallout, and currency depreciation. A weakened APC could lose its North West stronghold if NNPP or PDP consolidates.</p>
+      </div>
+      <div class="prediction-item">
+        <span class="pi-icon">🔴</span>
+        <p><strong>Labour Party's trajectory is uncertain.</strong> LP's 2023 performance (6.1M votes, 12 states) was remarkable for a party that barely existed nationally four years prior. If Peter Obi runs again or LP builds a national structure, it could become a genuine second-place force. Without that consolidation, the movement may fragment.</p>
+      </div>
+      <div class="prediction-item">
+        <span class="pi-icon">🔵</span>
+        <p><strong>PDP must confront internal reform.</strong> Two consecutive presidential losses with the same candidate (Atiku Abubakar) — and declining vote totals — signal that the party's traditional coalition is eroding. A new, younger candidate from the South could reinvigorate the party's competitiveness.</p>
+      </div>
+      <div class="prediction-item">
+        <span class="pi-icon">👥</span>
+        <p><strong>Youth mobilisation is the wildcard.</strong> With 75%+ of registrants under 50 years old, whoever successfully energises the youth vote — as the Obidient movement showed is possible — will have a decisive advantage. BVAS improvements and IREV transparency are expected to increase voter confidence.</p>
+      </div>
+      <div class="prediction-item">
+        <span class="pi-icon">📍</span>
+        <p><strong>South East remains the battleground to watch.</strong> LP's near-total sweep of the South East in 2023 (90%+ in the zone) was unprecedented. Whether this becomes a permanent political realignment or a one-election phenomenon depends heavily on Nigeria's federal resource distribution policy over the next 4 years.</p>
+      </div>
+    </div>
+    <p style="font-size:0.8rem; color:var(--text-light); font-style:italic;">Prediction is based on observed data trends and publicly reported political developments. It represents analytical inference, not a definitive forecast.</p>
+  </section>
+
+  <!-- 09 FILES -->
+  <section id="files">
+    <div class="section-label">09 — Project Files</div>
+    <h2>Explore the full analysis</h2>
+    <p>Access the interactive dashboard, download the dataset, or explore the source files below.</p>
+
+    <div class="files-grid">
+      <a href="#" class="file-link">
+        <div class="file-icon">📊</div>
+        <div class="fl-text">
+          <span class="fl-title">Live Dashboard</span>
+          <span class="fl-sub">Power BI Service</span>
+        </div>
+      </a>
+      <a href="#" class="file-link">
+        <div class="file-icon">📁</div>
+        <div class="fl-text">
+          <span class="fl-title">Power BI File</span>
+          <span class="fl-sub">.pbix — Desktop</span>
+        </div>
+      </a>
+      <a href="#" class="file-link">
+        <div class="file-icon">📄</div>
+        <div class="fl-text">
+          <span class="fl-title">Full Report</span>
+          <span class="fl-sub">.pdf — Word Doc</span>
+        </div>
+      </a>
+      <a href="#" class="file-link">
+        <div class="file-icon">🗄</div>
+        <div class="fl-text">
+          <span class="fl-title">Download Dataset</span>
+          <span class="fl-sub">Clean .xlsx — Public</span>
+        </div>
+      </a>
+      <a href="#" class="file-link">
+        <div class="file-icon">📑</div>
+        <div class="fl-text">
+          <span class="fl-title">Dashboard Export</span>
+          <span class="fl-sub">.pdf — Power BI</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="callout" style="margin-top:1.5rem;">
+      <strong>Links to be added by author.</strong> Replace each <code>#</code> in the file links above with your actual Google Drive, Power BI Service, or hosted file URLs.
+    </div>
+  </section>
+
+  <!-- 10 OTHER PROJECTS -->
+  <section id="other-projects">
+    <div class="section-label">10 — Other Projects</div>
+    <h2>More from this portfolio</h2>
+    <div class="projects-list">
+      <div class="project-item">
+        <div>
+          <div class="pi-title">Coffee Sales Performance Analysis</div>
+          <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.2rem;">Power BI · Data Analysis · Kaggle Dataset</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <span class="pi-tag">Power BI</span>
+          <a href="https://kehindeodewabi.github.io/portfolio/coffee-sales.html">View →</a>
+        </div>
+      </div>
+      <div class="project-item">
+        <div>
+          <div class="pi-title">[Add Project Title]</div>
+          <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.2rem;">Add description here</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <span class="pi-tag">Excel</span>
+          <a href="#">View →</a>
+        </div>
+      </div>
+      <div class="project-item">
+        <div>
+          <div class="pi-title">[Add Project Title]</div>
+          <div style="font-size:0.8rem; color:var(--text-light); margin-top:0.2rem;">Add description here</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <span class="pi-tag">SQL</span>
+          <a href="#">View →</a>
+        </div>
+      </div>
+    </div>
+    <p style="margin-top:1rem;"><a href="https://kehindeodewabi.github.io/portfolio/index.html" style="color:var(--green-bright); font-weight:600; text-decoration:none;">← Back to all projects</a></p>
+  </section>
+
+</main>
+
+<footer>
+  <p>© Kehinde Odewabi · Data Analyst · <a href="https://kehindeodewabi.github.io/portfolio/index.html">Portfolio</a></p>
+  <p style="margin-top:0.4rem; font-size:0.72rem; opacity:0.6;">Data sources: INEC, National Bureau of Statistics (NBS). Analysis covers top 4 parties only.</p>
+</footer>
+
+<script>
+  // Animate bars on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const bars = document.querySelectorAll('.bar-fill');
+    bars.forEach(b => {
+      const target = b.style.width;
+      b.style.width = '0%';
+      setTimeout(() => { b.style.width = target; }, 400);
+    });
+  });
+</script>
+
+</body>
+</html>
