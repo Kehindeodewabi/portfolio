@@ -1,0 +1,59 @@
+/* Custom additions for Kehinde's portfolio — layered on top of the original Hyperspace main.css */
+
+.intro-photo {
+	width: 168px;
+	height: 168px;
+	margin: 0 auto 28px;
+	border-radius: 50%;
+	padding: 5px;
+	background: linear-gradient(135deg, #5e42a6, #b74e91);
+	box-shadow: 0 20px 45px -12px rgba(94, 66, 166, 0.55);
+}
+
+.intro-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 50%;
+	border: 4px solid #241a3d;
+	display: block;
+}
+
+#intro .intro-role {
+	font-size: 1.3em;
+	color: #d9a6ff;
+	font-weight: 600;
+	margin-bottom: 0.6em;
+}
+
+#intro .intro-stack {
+	font-size: 0.85em;
+	color: rgba(255,255,255,0.65);
+	letter-spacing: 0.5px;
+	margin-bottom: 1.6em;
+}
+
+/* Slightly livelier accent on the dark sections — without overriding the
+   original template's subtle intro.svg network-pattern background */
+#header {
+	background-color: #4a2f7a;
+}
+
+#three.style1,
+#footer.style1-alt {
+	background-color: #3a2a63;
+}
+
+.button.small {
+	font-size: 0.7em;
+	padding: 0 1.6em;
+	height: 2.6em;
+	line-height: 2.6em;
+}
+
+@media screen and (max-width: 736px) {
+	.intro-photo {
+		width: 130px;
+		height: 130px;
+	}
+}
