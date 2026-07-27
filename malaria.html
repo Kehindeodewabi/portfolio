@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" type="image/png" href="Public.png">
+<title>Nigeria Malaria Burden Analysis · Kehinde Odewabi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --navy:    #0F2D4A;
+    --teal:    #1A6B8A;
+    --amber:   #D4891A;
+    --amber-lt:#F5B942;
+    --off-white:#F7F9FB;
+    --surface: #FFFFFF;
+    --border:  #DDE6EE;
+    --text:    #1C2B3A;
+    --muted:   #5F7A8A;
+    --positive:#D64E2A;
+    --negative:#2A7D8F;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--off-white);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(247,249,251,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 56px;
+  }
+
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--teal); letter-spacing: 1px;
+  }
+
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    font-size: 13px; color: var(--muted); text-decoration: none;
+    font-weight: 500; letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--navy); }
+
+  /* ── HERO ── */
+  .hero {
+    margin-top: 56px;
+    background: var(--navy);
+    padding: 80px 48px 72px;
+    position: relative; overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute; right: -20px; top: -30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 280px; font-weight: 900;
+    color: rgba(255,255,255,0.02);
+    line-height: 1; user-select: none; pointer-events: none;
+    letter-spacing: -10px;
+  }
+
+  .hero-mosquito {
+    position: absolute; right: 48px; bottom: 0;
+    opacity: 0.06; width: 260px; height: 260px;
+  }
+
+  .hero-inner { max-width: 820px; position: relative; z-index: 2; }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--amber-lt); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: ''; display: inline-block;
+    width: 32px; height: 1px; background: var(--amber-lt);
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 900; color: #FFFFFF;
+    line-height: 1.15; margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero h1 em {
+    font-style: normal; color: var(--amber-lt);
+  }
+
+  .hero-sub {
+    font-size: 16px; color: rgba(255,255,255,0.55);
+    max-width: 560px; margin-bottom: 40px;
+    font-weight: 300; line-height: 1.7;
+  }
+
+  .hero-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 5px 12px; border-radius: 2px;
+  }
+
+  /* ── HEADLINE STAT ── */
+  .headline-stat {
+    background: var(--amber);
+    padding: 0 48px;
+  }
+
+  .headline-inner {
+    display: flex; align-items: center; gap: 0;
+    border-left: none;
+  }
+
+  .h-stat {
+    padding: 24px 40px 24px 0;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    margin-right: 40px;
+  }
+  .h-stat:last-child { border-right: none; margin-right: 0; }
+
+  .h-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; font-weight: 900; color: #FFFFFF;
+    line-height: 1;
+  }
+
+  .h-stat-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.7); margin-top: 4px;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section { padding: 72px 48px; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+
+  .section-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px; font-weight: 700; color: var(--navy);
+    margin-bottom: 12px;
+  }
+
+  .section-lead {
+    font-size: 15px; color: var(--muted);
+    max-width: 640px; line-height: 1.75; margin-bottom: 40px;
+  }
+
+  /* ── CONTEXT SECTION ── */
+  .context-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .context-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 28px 28px;
+    border-left: 3px solid var(--teal);
+  }
+
+  .context-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; color: var(--navy);
+    margin-bottom: 10px;
+  }
+
+  .context-card p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* ── FINDINGS ── */
+  .findings-bg { background: var(--surface); }
+
+  .findings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px; margin-bottom: 32px;
+  }
+
+  .finding-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 24px 22px;
+    position: relative;
+  }
+
+  .finding-card::before {
+    content: attr(data-num);
+    position: absolute; top: 18px; right: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 48px; font-weight: 900;
+    color: rgba(26,107,138,0.06);
+    line-height: 1;
+  }
+
+  .finding-stat {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px; font-weight: 700;
+    color: var(--navy); line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .finding-stat span {
+    font-size: 16px; color: var(--teal);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+  }
+
+  .finding-label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+
+  .finding-desc {
+    font-size: 13px; color: var(--muted);
+    line-height: 1.65; border-top: 1px solid var(--border);
+    padding-top: 10px; margin-top: 6px;
+  }
+
+  /* ── ZONE TABLE ── */
+  .zone-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--off-white);
+    border-radius: 6px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .zone-table th {
+    background: var(--navy); color: rgba(255,255,255,0.8);
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 12px 16px; text-align: left; font-weight: 500;
+  }
+
+  .zone-table td {
+    padding: 12px 16px; font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .zone-table tr:last-child td { border-bottom: none; }
+  .zone-table tr:hover td { background: #EEF5FA; }
+
+  .bar-cell { width: 200px; }
+  .bar-wrap { background: #DDE6EE; border-radius: 2px; height: 8px; }
+  .bar-fill { height: 8px; border-radius: 2px; background: var(--amber); }
+  .bar-fill.high { background: var(--positive); }
+  .bar-fill.low  { background: var(--negative); }
+
+  .rate-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 500;
+    color: var(--navy);
+  }
+
+  /* ── WEALTH ── */
+  .wealth-grid {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  .wealth-row {
+    display: grid; grid-template-columns: 100px 1fr 80px;
+    align-items: center; gap: 16px;
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 4px; padding: 14px 18px;
+  }
+
+  .wealth-label {
+    font-size: 13px; font-weight: 500; color: var(--navy);
+  }
+
+  .wealth-bar-wrap { background: #DDE6EE; border-radius: 2px; height: 10px; }
+  .wealth-bar-fill {
+    height: 10px; border-radius: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--amber));
+  }
+
+  .wealth-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; font-weight: 500;
+    color: var(--navy); text-align: right;
+  }
+
+  /* ── RESIDENCY ── */
+  .residency-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .res-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 28px;
+    text-align: center;
+  }
+
+  .res-card h3 {
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 12px;
+  }
+
+  .res-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px; font-weight: 900; color: var(--navy);
+    line-height: 1;
+  }
+
+  .res-big span { font-size: 20px; color: var(--teal); }
+
+  .res-sub { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+  .res-card.highlight { border-top: 3px solid var(--positive); }
+
+  /* ── ITN SECTION ── */
+  .itn-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+
+  .itn-card {
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 24px 26px; display: flex; align-items: center; gap: 20px;
+  }
+
+  .itn-circle {
+    width: 80px; height: 80px; border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .itn-circle.no  { background: #FEF0E6; border: 3px solid #D4891A; }
+  .itn-circle.yes { background: #E6F4F1; border: 3px solid #1A8A6B; }
+
+  .itn-circle-pct {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--navy);
+    line-height: 1;
+  }
+
+  .itn-circle-label { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+
+  .itn-text h4 { font-size: 15px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .itn-text p  { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* ── METHODOLOGY ── */
+  .method-bg { background: var(--navy); }
+
+  .method-bg .section-eyebrow { color: var(--amber-lt); }
+  .method-bg .section-title   { color: #FFFFFF; }
+  .method-bg .section-lead    { color: rgba(255,255,255,0.5); }
+
+  .method-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; overflow: hidden;
+  }
+
+  .method-step {
+    background: rgba(255,255,255,0.03);
+    padding: 28px 24px;
+  }
+
+  .method-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--amber-lt);
+    letter-spacing: 2px; margin-bottom: 12px;
+  }
+
+  .method-step h4 {
+    font-size: 14px; font-weight: 600; color: #FFFFFF;
+    margin-bottom: 8px;
+  }
+
+  .method-step p {
+    font-size: 12px; color: rgba(255,255,255,0.4);
+    line-height: 1.7;
+  }
+
+  /* ── RECOMMENDATIONS ── */
+  .rec-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 24px 26px;
+    border-left: 3px solid var(--amber);
+  }
+
+  .rec-card h4 {
+    font-size: 15px; font-weight: 600; color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .rec-card p {
+    font-size: 13px; color: var(--muted); line-height: 1.7;
+  }
+
+  /* ── RESOURCES / LINKS ── */
+  .links-bg { background: var(--surface); }
+
+  .links-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;
+  }
+
+  .link-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 26px 22px;
+    display: flex; flex-direction: column; gap: 14px;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+
+  .link-card:hover {
+    border-color: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(15,45,74,0.08);
+  }
+
+  .link-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .link-icon svg { width: 18px; height: 18px; stroke: var(--amber-lt); }
+
+  .link-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; color: var(--navy); font-weight: 700;
+  }
+
+  .link-card p {
+    font-size: 12.5px; color: var(--muted); line-height: 1.6;
+    flex-grow: 1;
+  }
+
+  .link-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--teal); display: flex; align-items: center; gap: 6px;
+  }
+
+  .link-card:hover .link-cta { color: var(--amber); }
+
+  /* ── AUTHOR ── */
+  .author-section {
+    background: var(--off-white);
+    border-top: 1px solid var(--border);
+    padding: 48px;
+  }
+
+  .author-inner {
+    max-width: 1100px; margin: 0 auto;
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  }
+
+  .author-info h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; color: var(--navy); margin-bottom: 4px;
+  }
+
+  .author-info p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  .author-links { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .author-link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--teal); text-decoration: none;
+    border: 1px solid var(--teal);
+    padding: 8px 16px; border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .author-link:hover { background: var(--teal); color: #fff; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  footer p { font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
+
+  .footer-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 1px;
+  }
+
+  /* ── DIVIDER ── */
+  .amber-rule {
+    height: 3px; width: 48px;
+    background: var(--amber); border-radius: 1px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 0 20px; }
+    .hero, .section, .author-section, footer { padding-left: 20px; padding-right: 20px; }
+    .context-grid, .findings-grid, .residency-grid,
+    .itn-grid, .method-grid, .rec-grid, .links-grid { grid-template-columns: 1fr; }
+    .headline-inner { flex-wrap: wrap; }
+    .h-stat { border-right: none; padding-right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">KEHINDE ODEWABI · PUBLIC HEALTH ANALYTICS</div>
+  <div class="nav-links">
+    <a href="#context">Context</a>
+    <a href="#findings">Findings</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#resources">Resources</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">42%</div>
+
+  <svg class="hero-mosquito" viewBox="0 0 200 200" fill="none">
+    <ellipse cx="100" cy="105" rx="7" ry="28" fill="white"/>
+    <circle cx="100" cy="72" r="8" fill="white"/>
+    <line x1="100" y1="80" x2="100" y2="140" stroke="white" stroke-width="2.5"/>
+    <line x1="100" y1="140" x2="94" y2="170" stroke="white" stroke-width="1.5"/>
+    <ellipse cx="68" cy="88" rx="32" ry="10" fill="white" transform="rotate(-20 68 88)"/>
+    <ellipse cx="60" cy="100" rx="26" ry="7" fill="white" transform="rotate(-10 60 100)" opacity="0.5"/>
+    <ellipse cx="132" cy="88" rx="32" ry="10" fill="white" transform="rotate(20 132 88)"/>
+    <ellipse cx="140" cy="100" rx="26" ry="7" fill="white" transform="rotate(10 140 100)" opacity="0.5"/>
+    <line x1="95" y1="100" x2="55" y2="118" stroke="white" stroke-width="1.5"/>
+    <line x1="95" y1="108" x2="50" y2="130" stroke="white" stroke-width="1.5"/>
+    <line x1="95" y1="116" x2="52" y2="142" stroke="white" stroke-width="1.5"/>
+    <line x1="105" y1="100" x2="145" y2="118" stroke="white" stroke-width="1.5"/>
+    <line x1="105" y1="108" x2="150" y2="130" stroke="white" stroke-width="1.5"/>
+    <line x1="105" y1="116" x2="148" y2="142" stroke="white" stroke-width="1.5"/>
+    <line x1="96" y1="65" x2="80" y2="45" stroke="white" stroke-width="1.5"/>
+    <line x1="104" y1="65" x2="120" y2="45" stroke="white" stroke-width="1.5"/>
+  </svg>
+
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Public Health Data Analytics Project</div>
+    <h1>Malaria Prevalence Among<br><em>Under-5 Children</em> in Nigeria</h1>
+    <p class="hero-sub">A data analysis of the 2024 Nigeria Demographic and Health Survey, examining malaria burden, intervention coverage, and socioeconomic inequities across all 36 states and the FCT.</p>
+    <div class="hero-meta">
+      <span class="meta-tag">Nigeria DHS 2024</span>
+      <span class="meta-tag">DHS Phase 8</span>
+      <span class="meta-tag">Dec 2023 – May 2024</span>
+      <span class="meta-tag">27,783 Children Surveyed</span>
+      <span class="meta-tag">Power BI</span>
+    </div>
+  </div>
+</section>
+
+<!-- HEADLINE STATS BAR -->
+<div class="headline-stat">
+  <div class="headline-inner">
+    <div class="h-stat">
+      <div class="h-stat-num">27,783</div>
+      <div class="h-stat-label">Children Surveyed</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-num">12,795</div>
+      <div class="h-stat-label">RDT Tested</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-num">5,446</div>
+      <div class="h-stat-label">Positive Cases</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-num">42.56%</div>
+      <div class="h-stat-label">National Positivity Rate</div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-num">Kebbi</div>
+      <div class="h-stat-label">Highest Burden State · 456 Cases</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT -->
+<section class="section" id="context">
+  <div class="section-inner">
+    <div class="section-eyebrow">Background</div>
+    <div class="section-title">Why This Analysis Matters</div>
+    <div class="amber-rule"></div>
+    <p class="section-lead">Nigeria bears one of the heaviest malaria burdens in the world. Understanding how geography, wealth, and intervention coverage interact with disease outcomes is critical for targeted public health policy.</p>
+
+    <div class="context-grid">
+      <div class="context-card">
+        <h3>Dataset</h3>
+        <p>The 2024 Nigeria Demographic and Health Survey (NDHS) is a nationally representative cross-sectional survey conducted December 2023 through May 2024 under DHS Phase 8. Children's Recode file (NGKR8BFL) containing 27,783 child records was used as the primary data source, with malaria RDT biomarker results for 12,795 children under five years of age.</p>
+      </div>
+      <div class="context-card">
+        <h3>Analyst's Background</h3>
+        <p>This analysis builds directly on the author's undergraduate thesis; a 12-week field study on mosquito species distribution and breeding site ecology in Kwara State, Nigeria. The present project extends that inquiry from local entomology to national-scale epidemiological data, applying data analytics methods to the disease outcomes linked to the vectors studied at the grassroots level.</p>
+      </div>
+      <div class="context-card">
+        <h3>Scope & Variables</h3>
+        <p>Analysis covers malaria RDT test results (ML0), ITN/net usage (ML101), fever incidence (H22), wealth index (V190), residency type (V025), and geopolitical zone and state identifiers. Hemoglobin levels (HW53) were examined as an anemia proxy. Only children with valid RDT results were included in prevalence calculations.</p>
+      </div>
+      <div class="context-card">
+        <h3>Tools Used</h3>
+        <p>Data cleaning and variable labelling was done in Excel,while transformation and modelling were performed in Power BI Power Query. DAX measures were written for positivity rate calculations, conditional formatting, and KPI cards. The final dashboard was built in Power BI Desktop with custom background design and published for portfolio presentation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEY FINDINGS -->
+<section class="section findings-bg" id="findings">
+  <div class="section-inner">
+    <div class="section-eyebrow">Key Findings</div>
+    <div class="section-title">What the Data Reveals</div>
+    <div class="amber-rule"></div>
+    <p class="section-lead">Six findings emerge from this analysis spanning geography, wealth, intervention coverage, and healthcare-seeking behaviour among caregivers of under-five children.</p>
+
+    <div class="findings-grid">
+      <div class="finding-card" data-num="01">
+        <div class="finding-label">National Burden</div>
+        <div class="finding-stat">42.56<span>%</span></div>
+        <div class="finding-desc">Nearly half of all tested children under five years tested positive for malaria by RDT, a rate that signals endemic transmission across the country, not isolated outbreaks.</div>
+      </div>
+      <div class="finding-card" data-num="02">
+        <div class="finding-label">North–South Divide</div>
+        <div class="finding-stat">54<span>%</span></div>
+        <div class="finding-desc">North West zone recorded the highest positivity rate at 54%, followed closely by North East at 52%. South West recorded the lowest at 24.78% — more than double the difference between the two extremes.</div>
+      </div>
+      <div class="finding-card" data-num="03">
+        <div class="finding-label">Hardest-Hit State</div>
+        <div class="finding-stat">456<span>cases</span></div>
+        <div class="finding-desc">Kebbi State recorded the highest number of confirmed positive cases among all 37 states and FCT, followed by Katsina (353) and Zamfara (343), all in the North West zone.</div>
+      </div>
+      <div class="finding-card" data-num="04">
+        <div class="finding-label">Wealth Gradient</div>
+        <div class="finding-stat">48.95<span>%</span></div>
+        <div class="finding-desc">Children in the Poorer wealth quintile had the highest positivity rate at 48.95%. The Richest quintile recorded 31.37%, a 17.6 percentage point gap that reflects clear socioeconomic inequity in malaria burden.</div>
+      </div>
+      <div class="finding-card" data-num="05">
+        <div class="finding-label">Rural–Urban Gap</div>
+        <div class="finding-stat">5.73<span>pp</span></div>
+        <div class="finding-desc">Rural children had a positivity rate of 45% compared to 39% in urban areas, a 6 percentage point gap that likely reflects differential access to healthcare, ITNs, and vector control measures.</div>
+      </div>
+      <div class="finding-card" data-num="06">
+        <div class="finding-label">Net Usage Gap</div>
+        <div class="finding-stat">55.4<span>%</span></div>
+        <div class="finding-desc">Over half of surveyed children slept without any mosquito net the previous night. Only 43.98% slept under an ITN, revealing a critical intervention coverage gap despite Nigeria's national malaria control programme.</div>
+      </div>
+    </div>
+
+    <!-- Zone Table -->
+    <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin: 40px 0 16px;">Positivity Rate by Geopolitical Zone</h3>
+    <table class="zone-table">
+      <thead>
+        <tr>
+          <th>Zone</th>
+          <th>Negative</th>
+          <th>Positive</th>
+          <th>Total Tested</th>
+          <th>Positivity Rate</th>
+          <th class="bar-cell">Visual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>North West</strong></td>
+          <td>1,773</td><td>2,113</td><td>3,913</td>
+          <td><span class="rate-badge">54%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill high" style="width:100%"></div></div></td>
+        </tr>
+        <tr>
+          <td><strong>North East</strong></td>
+          <td>1,241</td><td>1,367</td><td>2,629</td>
+          <td><span class="rate-badge">52%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill high" style="width:96%"></div></div></td>
+        </tr>
+        <tr>
+          <td><strong>North Central</strong></td>
+          <td>1,485</td><td>878</td><td>2,378</td>
+          <td><span class="rate-badge">36.92%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill" style="width:68%"></div></div></td>
+        </tr>
+        <tr>
+          <td><strong>South South</strong></td>
+          <td>850</td><td>425</td><td>1,287</td>
+          <td><span class="rate-badge">33.02%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill" style="width:61%"></div></div></td>
+        </tr>
+        <tr>
+          <td><strong>South East</strong></td>
+          <td>983</td><td>355</td><td>1,345</td>
+          <td><span class="rate-badge">26.39%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill low" style="width:49%"></div></div></td>
+        </tr>
+        <tr>
+          <td><strong>South West</strong></td>
+          <td>933</td><td>308</td><td>1,243</td>
+          <td><span class="rate-badge">24.78%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill low" style="width:46%"></div></div></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Wealth Index -->
+    <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin: 40px 0 16px;">Malaria Positivity by Wealth Index</h3>
+    <div class="wealth-grid">
+      <div class="wealth-row">
+        <div class="wealth-label">Poorer</div>
+        <div class="wealth-bar-wrap"><div class="wealth-bar-fill" style="width:100%"></div></div>
+        <div class="wealth-pct">48.95%</div>
+      </div>
+      <div class="wealth-row">
+        <div class="wealth-label">Middle</div>
+        <div class="wealth-bar-wrap"><div class="wealth-bar-fill" style="width:93%"></div></div>
+        <div class="wealth-pct">45.6%</div>
+      </div>
+      <div class="wealth-row">
+        <div class="wealth-label">Poorest</div>
+        <div class="wealth-bar-wrap"><div class="wealth-bar-fill" style="width:93%"></div></div>
+        <div class="wealth-pct">45.46%</div>
+      </div>
+      <div class="wealth-row">
+        <div class="wealth-label">Richer</div>
+        <div class="wealth-bar-wrap"><div class="wealth-bar-fill" style="width:79%"></div></div>
+        <div class="wealth-pct">38.65%</div>
+      </div>
+      <div class="wealth-row">
+        <div class="wealth-label">Richest</div>
+        <div class="wealth-bar-wrap"><div class="wealth-bar-fill" style="width:64%"></div></div>
+        <div class="wealth-pct">31.37%</div>
+      </div>
+    </div>
+
+    <!-- Residency -->
+    <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin: 40px 0 16px;">Rural vs Urban Positivity</h3>
+    <div class="residency-grid">
+      <div class="res-card highlight">
+        <h3>Rural</h3>
+        <div class="res-big">45.08<span>%</span></div>
+        <div class="res-sub">Higher burden — limited access to healthcare and vector control</div>
+      </div>
+      <div class="res-card">
+        <h3>Urban</h3>
+        <div class="res-big">39.35<span>%</span></div>
+        <div class="res-sub">Lower but still high — urban malaria remains a significant concern</div>
+      </div>
+    </div>
+
+    <!-- ITN -->
+    <h3 style="font-family:'Playfair Display',serif; font-size:20px; color:var(--navy); margin: 40px 0 16px;">ITN / Net Usage Among Children</h3>
+    <div class="itn-grid">
+      <div class="itn-card">
+        <div class="itn-circle no">
+          <div class="itn-circle-pct">55.4%</div>
+          <div class="itn-circle-label">NO NET</div>
+        </div>
+        <div class="itn-text">
+          <h4>No Net Usage</h4>
+          <p>More than half of surveyed children slept without any mosquito net the night before the survey, representing the single largest intervention gap identified in this analysis.</p>
+        </div>
+      </div>
+      <div class="itn-card">
+        <div class="itn-circle yes">
+          <div class="itn-circle-pct">43.98%</div>
+          <div class="itn-circle-label">ITN</div>
+        </div>
+        <div class="itn-text">
+          <h4>Slept Under ITN</h4>
+          <p>Less than half of children slept under an insecticide-treated net despite ITN distribution being a cornerstone of Nigeria's National Malaria Elimination Programme (NMEP).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section class="section method-bg" id="methodology">
+  <div class="section-inner">
+    <div class="section-eyebrow">How This Was Done</div>
+    <div class="section-title" style="color:#fff">Methodology</div>
+    <div class="amber-rule"></div>
+    <p class="section-lead">This analysis followed a structured four-stage process from raw DHS data to published dashboard.</p>
+
+    <div class="method-grid">
+      <div class="method-step">
+        <div class="method-num">01 · DATA ACCESS</div>
+        <h4>DHS Program Registration</h4>
+        <p>Access to Nigeria DHS 2024 (Phase 8) microdata was obtained through the DHS Program portal. Children's Recode file (NGKR8BFL) was selected as the primary dataset containing child-level biomarker, household, and geographic variables.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-num">02 · CLEANING</div>
+        <h4>Power Query Transformation</h4>
+        <p>Cleaning was done in Excel and numeric codes were replaced with descriptive labels across all key variables. Rows without RDT results were excluded from prevalence calculations. State and zone codes were mapped to names.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-num">03 · ANALYSIS</div>
+        <h4>DAX Measures & Aggregation</h4>
+        <p>DAX measures were written for malaria positivity rate, RDT tested count, total positive cases, and conditional KPI formatting. Cross-tabulations were built across zone, state, wealth index, and residency type to surface equity-relevant patterns.</p>
+      </div>
+      <div class="method-step">
+        <div class="method-num">04 · VISUALISATION</div>
+        <h4>Power BI Dashboard</h4>
+        <p>An interactive Power BI dashboard was built featuring a Nigeria state-level choropleth map, donut chart, stacked bar charts, and KPI cards. Zone and state slicers enable dynamic filtering. Dashboard background was custom-designed with public health thematic elements.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RECOMMENDATIONS -->
+<section class="section" id="recommendations">
+  <div class="section-inner">
+    <div class="section-eyebrow">Policy Implications</div>
+    <div class="section-title">Recommendations</div>
+    <div class="amber-rule"></div>
+    <p class="section-lead">These findings point to four evidence-based areas where targeted intervention could meaningfully reduce malaria burden among Nigerian children under five.</p>
+
+    <div class="rec-grid">
+      <div class="rec-card">
+        <h4>1. Priority Targeting of North West & North East</h4>
+        <p>With positivity rates exceeding 50% in both zones — and Kebbi, Katsina, and Zamfara as the three hardest-hit states — resources for bed net distribution, indoor residual spraying, and community health worker deployment should be concentrated in these areas first.</p>
+      </div>
+      <div class="rec-card">
+        <h4>2. Close the ITN Access-to-Use Gap</h4>
+        <p>55.4% of children sleeping without nets despite national distribution campaigns suggests a behavioural and access gap — not purely a supply problem. Community-level education and follow-up verification of net use should accompany future distribution rounds.</p>
+      </div>
+      <div class="rec-card">
+        <h4>3. Socioeconomic-Targeted Interventions</h4>
+        <p>The 17.6 percentage point gap between the Poorer and Richest quintiles confirms that malaria in Nigeria is partly a poverty disease. Conditional health support schemes and free treatment access for children in the two lowest wealth quintiles would reduce this inequity.</p>
+      </div>
+      <div class="rec-card">
+        <h4>4. Strengthen Rural Healthcare Infrastructure</h4>
+        <p>Rural children face 6 percentage point higher positivity rate than urban children. Expanding community-based RDT testing, artemisinin-based therapy availability, and rural health post staffing would directly address this disparity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="section links-bg" id="resources">
+  <div class="section-inner">
+    <div class="section-eyebrow">Access The Work</div>
+    <div class="section-title">Resources & Downloads</div>
+    <div class="amber-rule"></div>
+    <p class="section-lead">The full project is available below — read the written report, explore the interactive dashboard, or download the source files.</p>
+
+    <div class="links-grid">
+      <!-- EDIT href="#" links below once files are hosted -->
+      <a href="https://drive.google.com/file/d/1xhiWuXkfj_K3oT_2NtqoOtE4LpKBvBtM/view?usp=drive_link" class="link-card" target="_blank">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h4>Full Report</h4>
+        <p>Written analysis covering methodology, findings, and policy recommendations in full detail.</p>
+        <div class="link-cta">Read Report →</div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/1mBex_go7y1SYE8ZYaJjn2rV1ABbG5Er1/view?usp=drive_link" class="link-card" target="_blank">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h4>Dashboard File (.pbix)</h4>
+        <p>Download the native Power BI file to explore the data model, DAX measures, and visuals directly.</p>
+        <div class="link-cta">Download .pbix →</div>
+      </a>
+
+      <a href="https://app.powerbi.com/links/0KHK4xp3JV?ctid=a29037ad-c24c-47f1-b52f-ec3218d5c4e9&pbi_source=linkShare" class="link-card" target="_blank">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <h4>Live Dashboard</h4>
+        <p>View the interactive, published version on Power BI Service — filter by zone, state, and demographic.</p>
+        <div class="link-cta">Open Live Dashboard →</div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/1K5i5AeOkkjiUar1ch8yGFVGkhHuZy_2r/view?usp=drive_link" class="link-card" target="_blank">
+        <div class="link-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+        </div>
+        <h4>Dashboard PDF Export</h4>
+        <p>A static, print-ready PDF snapshot of the full dashboard for offline viewing and quick reference.</p>
+        <div class="link-cta">View PDF →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<div class="author-section">
+  <div class="author-inner">
+    <div class="author-info">
+      <h3>Kehinde Odewabi</h3>
+      <p>Zoology Graduate · Data Analyst · Public Health Analytics Portfolio<br>
+      University of Ilorin, 2024 ·  Nigeria</p>
+    </div>
+    <div class="author-links">
+      <a href="https://kehindeodewabi.github.io/Public-Health-Informatics-Portfolio/" class="author-link" target="_blank">Portfolio</a>
+      <a href="https://linkedin.com/in/kehindeodewabi" class="author-link" target="_blank">LinkedIn</a>
+      <a href="mailto:kehindeodewabi@gmail.com" class="author-link">Email</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Data source: Nigeria Demographic and Health Survey 2024 · DHS Program · dhsprogram.com</p>
+  <div class="footer-mono">KEHINDE ODEWABI · PORTFOLIO 2026</div>
+</footer>
+
+</body>
+</html>
